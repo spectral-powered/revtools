@@ -16,3 +16,17 @@ enableFeaturePreview(TYPESAFE_PROJECT_ACCESSORS.name)
 
 rootProject.name = "revtools"
 
+/**
+ * === START MODULES ===
+ */
+
+module(":asm")
+
+/**
+ * === END MODULES ===
+ */
+
+private fun module(identifier: String) {
+    include(identifier)
+    project(identifier).name = "${rootProject.name}-${identifier.split(":").last()}"
+}
