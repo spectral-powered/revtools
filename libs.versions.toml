@@ -7,7 +7,7 @@ clikt = "4.2.1"
 asm = "9.6"
 guava = "32.1.3-jre"
 jgrapht = "1.5.2"
-shapeshift = "0.8.0"
+jsoup = "1.17.1"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -21,7 +21,7 @@ asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 jgrapht = { module = "org.jgrapht:jgrapht-core", version.ref = "jgrapht" }
-shapeshift = { module = "dev.krud:shapeshift", version.ref = "shapeshift" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

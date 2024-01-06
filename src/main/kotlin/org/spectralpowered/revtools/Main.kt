@@ -24,7 +24,9 @@ fun main(args: Array<String>) {
     }
 
     RevToolsCommand(Terminal(theme = theme))
-        .subcommands()
+        .subcommands(
+            DownloadGamepackCommand()
+        )
         .main(args)
 }
 

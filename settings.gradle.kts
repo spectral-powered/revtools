@@ -26,7 +26,7 @@ module(":asm")
  * === END MODULES ===
  */
 
-private fun module(identifier: String) {
+fun module(identifier: String) {
     include(identifier)
     project(identifier).name = "${rootProject.name}-${identifier.split(":").last()}"
 }

@@ -50,6 +50,7 @@ allprojects {
 
 dependencies {
     implementation(libs.clikt)
+    implementation(libs.jsoup)
 }
 
 application {

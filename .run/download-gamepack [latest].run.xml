@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="download-gamepack [latest]" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="Kotlin SDK" />
+    <option name="MAIN_CLASS_NAME" value="org.spectralpowered.revtools.MainKt" />
+    <module name="revtools.main" />
+    <option name="PROGRAM_PARAMETERS" value="download build/gamepack/gamepack-latest.jar" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
