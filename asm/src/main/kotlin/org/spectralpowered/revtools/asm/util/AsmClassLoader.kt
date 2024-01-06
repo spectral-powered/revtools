@@ -10,7 +10,7 @@ class AsmClassLoader(private val group: ClassGroup) : ClassLoader() {
 
     private fun getClassBytes(name: String): ByteArray? {
         val writer = ClassWriter(ClassWriter.COMPUTE_MAXS)
-        val cls = group.findClass(name.asmName) ?: group.findIgnoredClass(name.asmName) ?: return null
+        val cls = group.findClass(name.asmName) ?: return null
         cls.accept(writer)
         return writer.toByteArray()
     }
