@@ -3,8 +3,10 @@ package org.spectralpowered.revtools.asm
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.FrameNode
+import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.JumpInsnNode
 import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.LineNumberNode
 import org.objectweb.asm.tree.LookupSwitchInsnNode
 import org.objectweb.asm.tree.TableSwitchInsnNode
@@ -53,3 +55,19 @@ fun AbstractInsnNode.toOpcodeString(): String {
         else -> Printer.OPCODES[opcode]
     }
 }
+
+val AbstractInsnNode.intConstant: Int? get() = when(this) {
+    is IntInsnNode -> when(opcode) {
+        BIPUSH, SIPUSH -> operand
+        else -> null
+    }
+    is LdcInsnNode -> when(cst) {
+        is Int -> cst as Int
+        else -> null
+    }
+    else -> when(opcode) {
+        in ICONST_M1..ICONST_5 -> opcode - 3
+        else -> null
+    }
+}
+

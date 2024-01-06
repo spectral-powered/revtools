@@ -62,6 +62,7 @@ open class BasicExpr(open val insn: AbstractInsnNode) : Expr {
             in IADD..LXOR -> MathExpr(insn as InsnNode)
             in IFEQ..IFLE, IFNULL, IFNONNULL -> BranchExpr(insn as JumpInsnNode)
             in IF_ICMPEQ..IF_ACMPNE -> CmpBranchExpr(insn as JumpInsnNode)
+            in ICONST_M1..SIPUSH -> ConstExpr(insn)
             else -> BasicExpr(insn)
         }
     }

@@ -48,7 +48,6 @@ class ClassGroup {
     fun getIgnoredClass(name: String) = ignoredClassMap[name]
 
     fun findClass(name: String) = getClass(name) ?: getIgnoredClass(name)
-
     fun containsClass(name: String) = classMap.containsKey(name)
 
     fun readArchive(archive: AbstractArchive) {
@@ -72,5 +71,11 @@ class ClassGroup {
             cls.init(this)
             cls.recomputeFrames()
         }
+    }
+
+    fun clear() {
+        classMap.clear()
+        ignoredClassMap.clear()
+        resources.clear()
     }
 }

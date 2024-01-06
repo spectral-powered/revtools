@@ -9,6 +9,8 @@ import org.spectralpowered.revtools.asm.util.field
 var MethodNode.cls: ClassNode by field()
 val MethodNode.group get() = cls.group
 
+val MethodNode.id get() = "${cls.id} $name $desc"
+
 val MethodNode.exprTree get() = ExprTree.build(this)
 
 fun MethodNode.isConstructor() = name == "<init>"
