@@ -49,6 +49,7 @@ allprojects {
 }
 
 dependencies {
+    implementation(projects.deobfuscator)
     implementation(libs.clikt)
     implementation(libs.jsoup)
 }
@@ -57,3 +58,20 @@ application {
     mainClass.set("org.spectralpowered.revtools.MainKt")
 }
 
+tasks.register("download-gamepack", JavaExec::class) {
+    dependsOn(tasks.run.get().dependsOn)
+    group = "revtools"
+    mainClass.set(tasks.run.get().mainClass.get())
+    classpath = tasks.run.get().classpath
+    workingDir = rootProject.projectDir
+    args = mutableListOf("download", "build/deob/gamepack.jar")
+}
+
+tasks.register("deobfuscate", JavaExec::class) {
+    dependsOn(tasks.run.get().dependsOn)
+    group = "revtools"
+    mainClass.set(tasks.run.get().mainClass.get())
+    classpath = tasks.run.get().classpath
+    workingDir = rootProject.projectDir
+    args = mutableListOf("deobfuscate", "build/deob/gamepack.jar", "build/deob/gamepack.deob.jar")
+}

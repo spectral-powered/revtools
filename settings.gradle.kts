@@ -20,13 +20,9 @@ rootProject.name = "revtools"
  * === START MODULES ===
  */
 
-module(":asm")
+include(":asm")
+include(":deobfuscator")
 
 /**
  * === END MODULES ===
  */
-
-fun module(identifier: String) {
-    include(identifier)
-    project(identifier).name = "${rootProject.name}-${identifier.split(":").last()}"
-}

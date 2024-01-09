@@ -2,18 +2,15 @@ package org.spectralpowered.revtools
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.arguments.validate
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import org.jsoup.Jsoup
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardOpenOption
 import java.util.Properties
 
-class DownloadGamepackCommand : CliktCommand(
+class DownloadCommand : CliktCommand(
     name = "download",
     help = "Downloads the latest or specific revision gamepack (client.jar) for Old School RuneScape"
 ) {
