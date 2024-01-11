@@ -1,8 +1,11 @@
 package org.spectralpowered.revtools.deobfuscator.transformer
 
-import org.objectweb.asm.tree.TryCatchBlockNode
-import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.deobfuscator.Logger
 import org.spectralpowered.revtools.deobfuscator.Transformer
+import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
+import org.spectralpowered.revtools.deobfuscator.asm.tree.id
+import org.spectralpowered.revtools.deobfuscator.asm.tree.parents
+import org.spectralpowered.revtools.deobfuscator.asm.tree.removeDeadCode
 
 class RuntimeExceptionRemover : Transformer {
 
@@ -11,17 +14,18 @@ class RuntimeExceptionRemover : Transformer {
     override fun run(group: ClassGroup) {
         for(cls in group.classes) {
             for(method in cls.methods) {
-                val toRemove = mutableListOf<TryCatchBlockNode>()
-                for(tcb in method.tryCatchBlocks) {
+                val itr = method.tryCatchBlocks.iterator()
+                while(itr.hasNext()) {
+                    val tcb = itr.next()
                     if(tcb.type == "java/lang/RuntimeException") {
-                        toRemove.add(tcb)
+                        itr.remove()
+                        count++
                     }
                 }
-                method.tryCatchBlocks.removeAll(toRemove)
-                count += toRemove.size
+                method.removeDeadCode()
             }
         }
 
-        println("Removed $count RuntimeException try-catch blocks")
+        Logger.info("Removed $count RuntimeException try-catch blocks.")
     }
 }

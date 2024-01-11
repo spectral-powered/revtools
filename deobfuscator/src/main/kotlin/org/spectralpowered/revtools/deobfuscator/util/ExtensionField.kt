@@ -1,4 +1,4 @@
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.deobfuscator.util
 
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference

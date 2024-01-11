@@ -1,6 +1,6 @@
 package org.spectralpowered.revtools.deobfuscator
 
-import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
 
 interface Transformer {
 

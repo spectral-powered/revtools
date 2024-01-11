@@ -3,5 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.asm)
+    implementation(libs.mordant)
+    implementation(libs.bundles.asm)
+    implementation(libs.guava)
 }
