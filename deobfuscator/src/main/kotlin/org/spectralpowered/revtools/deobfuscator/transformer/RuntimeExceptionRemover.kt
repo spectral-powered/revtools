@@ -3,8 +3,6 @@ package org.spectralpowered.revtools.deobfuscator.transformer
 import org.spectralpowered.revtools.deobfuscator.Logger
 import org.spectralpowered.revtools.deobfuscator.Transformer
 import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
-import org.spectralpowered.revtools.deobfuscator.asm.tree.id
-import org.spectralpowered.revtools.deobfuscator.asm.tree.parents
 import org.spectralpowered.revtools.deobfuscator.asm.tree.removeDeadCode
 
 class RuntimeExceptionRemover : Transformer {

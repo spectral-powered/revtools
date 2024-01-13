@@ -28,7 +28,7 @@ fun ClassNode.build() {
     implementerClasses.clear()
 
     // Build
-    superClass = group.resolveClass(superName)
+    superClass = superName?.let { group.resolveClass(it) }
     superClass?.subClasses?.add(this)
     interfaces.map { group.resolveClass(it) }.forEach { itf ->
         interfaceClasses.add(itf)
@@ -47,28 +47,8 @@ val ClassNode.interfaceClasses: MutableSet<ClassNode> by field { mutableSetOf() 
 val ClassNode.subClasses: MutableSet<ClassNode> by field { mutableSetOf() }
 val ClassNode.implementerClasses: MutableSet<ClassNode> by field { mutableSetOf() }
 
-val ClassNode.parents get() = setOfNotNull(superClass).plus(interfaceClasses)
-val ClassNode.children get() = subClasses.plus(implementerClasses).toSet()
-
-val ClassNode.allParents: Set<ClassNode> get() {
-    val ret = mutableSetOf<ClassNode>()
-    var parents = parents.toList()
-    do {
-        ret.addAll(parents)
-        parents = parents.flatMap { it.allParents }
-    } while(parents.isNotEmpty())
-    return ret
-}
-
-val ClassNode.allChildren: Set<ClassNode> get() {
-    val ret = mutableSetOf<ClassNode>()
-    var children = children.toList()
-    do {
-        ret.addAll(children)
-        children = children.flatMap { it.allChildren }
-    } while(children.isNotEmpty())
-    return ret
-}
+val ClassNode.parents: Collection<ClassNode> get() = listOfNotNull(superClass).plus(interfaceClasses)
+val ClassNode.children: Collection<ClassNode> get() = subClasses.plus(implementerClasses)
 
 val ClassNode.id get() = name
 val ClassNode.key get() = name
@@ -97,14 +77,12 @@ fun ClassNode.getFieldByKey(key: String) = fields.firstOrNull { it.key == key }
 fun ClassNode.findMethod(name: String, desc: String): MethodNode? {
     var ret = getMethod(name, desc)
     if(ret != null) return ret
-
-    ret = superClass?.findMethod(name, desc)
-    if(ret != null) return ret
-
-    ret = interfaceClasses.firstNotNullOfOrNull { it.findMethod(name, desc) }
-    if(ret != null) return ret
-
-    return null
+    var parents = this.parents
+    do {
+        ret = parents.firstNotNullOfOrNull { it.getMethod(name, desc) }
+        parents = parents.flatMap { it.parents }
+    } while(ret == null && parents.isNotEmpty())
+    return ret ?: this.parents.map { it.getMethod(name, desc) }.firstOrNull()
 }
 
 fun ClassNode.findField(name: String, desc: String = ""): FieldNode? {

@@ -1,7 +1,10 @@
 package org.spectralpowered.revtools.deobfuscator
 
 import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
+import org.spectralpowered.revtools.deobfuscator.transformer.AddDeobClasses
+import org.spectralpowered.revtools.deobfuscator.transformer.IllegalStateExceptionRemover
 import org.spectralpowered.revtools.deobfuscator.transformer.RuntimeExceptionRemover
+import org.spectralpowered.revtools.deobfuscator.transformer.UniqueRenamer
 import java.io.File
 import kotlin.reflect.full.createInstance
 
@@ -23,7 +26,12 @@ class Deobfuscator(
          * === TRANSFORMERS ===
          * NOTE: The register order is IMPORTANT and will be the run order of the transformers.
          */
+
+        register<AddDeobClasses>()
         register<RuntimeExceptionRemover>()
+        register<IllegalStateExceptionRemover>()
+        register<UniqueRenamer>()
+
         /**
          * === END TRANSFORMERS ===
          */

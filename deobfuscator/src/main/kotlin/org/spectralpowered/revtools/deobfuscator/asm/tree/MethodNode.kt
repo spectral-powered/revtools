@@ -3,6 +3,7 @@ package org.spectralpowered.revtools.deobfuscator.asm.tree
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TryCatchBlockNode
 import org.objectweb.asm.tree.analysis.Analyzer
@@ -22,6 +23,8 @@ val MethodNode.group get() = cls.group
 
 val MethodNode.id get() = "${cls.id} $name $desc"
 val MethodNode.key get() = "${cls.key}.$name$desc"
+
+fun MethodNode.isRoot() = cls.parents.none { it.getMethod(name, desc) != null }
 
 fun MethodNode.isConstructor() = name == "<init>"
 fun MethodNode.isInitializer() = name == "<clinit>"
