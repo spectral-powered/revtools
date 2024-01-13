@@ -10,6 +10,8 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.util.CheckClassAdapter
+import org.spectralpowered.revtools.deobfuscator.Logger
+import org.spectralpowered.revtools.deobfuscator.asm.AsmClassWriter
 import org.spectralpowered.revtools.deobfuscator.util.field
 import org.spectralpowered.revtools.deobfuscator.util.nullField
 import java.io.InputStream
@@ -49,6 +51,9 @@ val ClassNode.implementerClasses: MutableSet<ClassNode> by field { mutableSetOf(
 
 val ClassNode.parents: Collection<ClassNode> get() = listOfNotNull(superClass).plus(interfaceClasses)
 val ClassNode.children: Collection<ClassNode> get() = subClasses.plus(implementerClasses)
+
+val ClassNode.allParents: Collection<ClassNode> get() = listOfNotNull(superClass).plus(interfaceClasses).flatMap { it.allParents.plus(it) }
+val ClassNode.allChildren: Collection<ClassNode> get() = subClasses.plus(implementerClasses).flatMap { it.allChildren.plus(it) }
 
 val ClassNode.id get() = name
 val ClassNode.key get() = name
@@ -95,6 +100,37 @@ fun ClassNode.findField(name: String, desc: String = ""): FieldNode? {
     return null
 }
 
+fun ClassNode.findMethodOverrides(name: String, desc: String): List<MethodNode> {
+    val ret = mutableListOf<MethodNode>()
+    val superCls = this.superClass
+    if(superCls != null) {
+        superCls.getMethod(name, desc)?.also { ret.add(it) }
+        superCls.findMethodOverrides(name, desc).also { ret.addAll(it) }
+    }
+    for(superItf in interfaceClasses) {
+        superItf.getMethod(name, desc)?.also { ret.add(it) }
+        superItf.findMethodOverrides(name, desc).also { ret.addAll(it) }
+    }
+    return ret
+}
+
+fun ClassNode.isSuperClassOf(other: ClassNode): Boolean {
+    val superCls = other.superClass ?: return false
+    if(superCls == this) return true
+    return this.isSuperClassOf(superCls)
+}
+
+fun ClassNode.isSuperInterfaceOf(other: ClassNode): Boolean {
+    for(superItf in other.interfaceClasses) {
+        if(superItf == this || isSuperInterfaceOf(superItf)) return true
+    }
+    return false
+}
+
+fun ClassNode.isAssignableFrom(other: ClassNode): Boolean {
+    return other == this || isSuperClassOf(other) || isSuperInterfaceOf(other)
+}
+
 fun ClassNode.fromInputStream(input: InputStream, flags: Int): ClassNode {
     val reader = ClassReader(input)
     reader.accept(this, flags)
@@ -103,10 +139,18 @@ fun ClassNode.fromInputStream(input: InputStream, flags: Int): ClassNode {
 
 fun ClassNode.fromBytes(bytes: ByteArray, flags: Int) = fromInputStream(bytes.inputStream(), flags)
 
-fun ClassNode.toBytes(flags: Int): ByteArray {
-    val writer = ClassWriter(flags)
-    val adapter = CheckClassAdapter(writer, true)
-    this.accept(adapter)
-    return writer.toByteArray()
+fun ClassNode.toBytes(flags: Int = ClassWriter.COMPUTE_FRAMES): ByteArray {
+    val writer = AsmClassWriter(group, flags)
+    this.accept(writer)
+    val bytes = writer.toByteArray()
+    try {
+        val flowReader = ClassReader(bytes)
+        val flowWriter = ClassWriter(flowReader, 0)
+        val flowChecker = CheckClassAdapter(flowWriter, true)
+        flowReader.accept(flowChecker, 0)
+    } catch (e: Exception) {
+        Logger.error("Class $name failed data-flow validation.", e)
+    }
+    return bytes
 }
 

@@ -1,10 +1,8 @@
 package org.spectralpowered.revtools.deobfuscator
 
+import ControlFlowOptimizer
 import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
-import org.spectralpowered.revtools.deobfuscator.transformer.AddDeobClasses
-import org.spectralpowered.revtools.deobfuscator.transformer.IllegalStateExceptionRemover
-import org.spectralpowered.revtools.deobfuscator.transformer.RuntimeExceptionRemover
-import org.spectralpowered.revtools.deobfuscator.transformer.UniqueRenamer
+import org.spectralpowered.revtools.deobfuscator.transformer.*
 import java.io.File
 import kotlin.reflect.full.createInstance
 
@@ -31,6 +29,9 @@ class Deobfuscator(
         register<RuntimeExceptionRemover>()
         register<IllegalStateExceptionRemover>()
         register<UniqueRenamer>()
+        register<ControlFlowOptimizer>()
+        register<UnusedMethodRemover>()
+        register<UnusedArgRemover>()
 
         /**
          * === END TRANSFORMERS ===

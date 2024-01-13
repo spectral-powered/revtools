@@ -24,8 +24,6 @@ val MethodNode.group get() = cls.group
 val MethodNode.id get() = "${cls.id} $name $desc"
 val MethodNode.key get() = "${cls.key}.$name$desc"
 
-fun MethodNode.isRoot() = cls.parents.none { it.getMethod(name, desc) != null }
-
 fun MethodNode.isConstructor() = name == "<init>"
 fun MethodNode.isInitializer() = name == "<clinit>"
 
