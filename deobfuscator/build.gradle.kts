@@ -6,4 +6,5 @@ dependencies {
     implementation(libs.mordant)
     implementation(libs.bundles.asm)
     implementation(libs.guava)
+    implementation(libs.jgrapht)
 }

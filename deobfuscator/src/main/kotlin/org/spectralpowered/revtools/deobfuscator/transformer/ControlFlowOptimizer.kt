@@ -1,264 +1,431 @@
-import org.objectweb.asm.Type
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.JumpInsnNode
-import org.objectweb.asm.tree.LabelNode
-import org.objectweb.asm.tree.LookupSwitchInsnNode
-import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.TableSwitchInsnNode
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.SetMultimap
+import org.jgrapht.Graphs
+import org.jgrapht.graph.DefaultDirectedGraph
+import org.jgrapht.graph.DefaultEdge
+import org.jgrapht.traverse.DepthFirstIterator
+import org.objectweb.asm.tree.*
 import org.objectweb.asm.tree.analysis.Analyzer
 import org.objectweb.asm.tree.analysis.BasicInterpreter
 import org.objectweb.asm.tree.analysis.BasicValue
 import org.spectralpowered.revtools.deobfuscator.Transformer
 import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
 import org.spectralpowered.revtools.deobfuscator.asm.tree.cls
-import org.spectralpowered.revtools.deobfuscator.asm.tree.removeDeadCode
+import java.util.*
+import kotlin.math.min
+
 
 class ControlFlowOptimizer : Transformer {
 
+    private var count = 0
+
     override fun run(group: ClassGroup) {
-        for(cls in group.classes) {
-            for(method in cls.methods) {
-                method.removeDeadCode()
-                val cfg = ControlFlowGraph(method)
-                val blocks = cfg.blocks
-                println()
+        for(method in group.classes.flatMap { it.methods }) {
+            if(method.tryCatchBlocks.isNotEmpty()) continue
+            val cfg = ControlFlowGraph(method).build()
+            val blocks = cfg.blocks
+            if(blocks.isNotEmpty()) {
+                val insns = method.instructions
+                val newInsns = InsnList()
+
+                val labels = hashMapOf<LabelNode, LabelNode>()
+                insns.filterIsInstance<LabelNode>().forEachIndexed { _, label ->
+                    labels[label] = LabelNode(label.label)
+                }
+
+                val queue = Stack<Block>()
+                val visited = hashSetOf<Block>()
+                queue.push(blocks.first())
+                while(queue.isNotEmpty()) {
+                    val block = queue.pop()
+                    if(block in visited) continue
+                    visited.add(block)
+                    block.branches.forEach { queue.push(it.root) }
+                    block.next?.also { queue.push(it) }
+                    for(i in block.start until block.end) {
+                        newInsns.add(insns[i].clone(labels))
+                    }
+                }
+                method.instructions = newInsns
+                count += blocks.size
             }
         }
     }
 
-    class ControlFlowGraph(private val method: MethodNode) : Analyzer<BasicValue>(BasicInterpreter()) {
+    private class ControlFlowGraph(private val method: MethodNode) : Analyzer<BasicValue>(BasicInterpreter()) {
 
+        private val blockGraph = DefaultDirectedGraph<Block, DefaultEdge>(DefaultEdge::class.java)
         val blocks = mutableListOf<Block>()
-        val catchBlocks = mutableListOf<CatchBlock>()
 
-        private val insnToBlock = MutableList<Block?>(method.instructions.size()) { null }
-        private val blockToInsn = hashMapOf<Block, MutableList<AbstractInsnNode>>()
-        private val insnIndicies = hashMapOf<AbstractInsnNode, Int>()
-
-        private fun addBlock(block: Block) {
-            if(block !in blocks) {
-                blocks.add(block)
-            }
-        }
-
-        private fun addCatchBlock(block: CatchBlock) {
-            require(block in blocks)
-            catchBlocks.add(block)
-        }
-
-        init {
+        fun build(): ControlFlowGraph {
             analyze(method.cls.name, method)
-        }
-
-        private val AbstractInsnNode.index: Int get() = insnIndicies.getOrPut(this) { method.instructions.indexOf(this) }
-
-        private inline fun <T> MutableList<T?>.getOrSet(index: Int, block: () -> T): T {
-            if(this[index] == null) {
-                this[index] = block()
-            }
-            return this[index]!!
+            return this
         }
 
         override fun init(owner: String, method: MethodNode) {
-            for(tcb in method.tryCatchBlocks) {
-                val type = when(tcb.type) {
-                    null -> CatchBlock.DEFAULT_EXCEPTION_TYPE
-                    else -> Type.getType(tcb.type)
-                }
-                insnToBlock[tcb.handler.index] = CatchBlock("catch", type)
-            }
-
-            var block: Block = BasicBlock("block")
-            var insnList = blockToInsn.getOrPut(block, ::arrayListOf)
-
+            var block = Block()
+            blocks.add(block)
             for((insnIndex, insn) in method.instructions.withIndex()) {
-                if(insn is LabelNode) {
-                    when {
-                        insn.next == null -> Unit
-                        insn.previous == null -> {
-                            block = insnToBlock.getOrSet(insnIndex) { block }
+                block.end++
+                if(insn.next == null) break
+                if(insn.next is LabelNode || insn is JumpInsnNode || insn is TableSwitchInsnNode || insn is LookupSwitchInsnNode) {
+                    block = Block()
+                    block.start = insnIndex + 1
+                    block.end = insnIndex + 1
+                    blocks.add(block)
+                }
+            }
+        }
 
-                            val entry = BasicBlock("entry")
-                            blockToInsn[entry] = arrayListOf()
-                            entry.linkForward(block)
-
-                            addBlock(entry)
-                        }
-                        else -> {
-                            block = insnToBlock.getOrSet(insnIndex) { BasicBlock("label") }
-                            insnList = blockToInsn.getOrPut(block, ::arrayListOf)
-
-                            if(!insn.previous.isTerminator()) {
-                                val prev = insnToBlock[insnIndex - 1]!!
-                                block.linkBackward(prev)
-                            }
-                        }
-                    }
+        override fun newControlFlowEdge(from: Int, to: Int) {
+            val fromBlock = blocks.first { from in it.start until it.end }
+            val toBlock = blocks.first { to in it.start until it.end }
+            blockGraph.addVertex(fromBlock)
+            blockGraph.addVertex(toBlock)
+            blockGraph.addEdge(fromBlock, toBlock)
+            if(fromBlock != toBlock) {
+                blockGraph.addEdge(fromBlock, toBlock)
+                if(from + 1 == to) {
+                    fromBlock.next = toBlock
+                    toBlock.prev = fromBlock
                 } else {
-                    block = insnToBlock.getOrSet(insnIndex) { block }
-                    insnList = blockToInsn.getOrPut(block, ::arrayListOf)
+                    fromBlock.branches.add(toBlock)
+                }
+            }
+        }
 
-                    when(insn) {
-                        is JumpInsnNode -> {
-                            if(insn.opcode != GOTO) {
-                                val falseSuccessor = insnToBlock.getOrSet(insnIndex + 1) { BasicBlock("if.else") }
-                                block.linkForward(falseSuccessor)
+        override fun newControlFlowExceptionEdge(from: Int, to: Int): Boolean {
+            //newControlFlowEdge(from, to)
+            return true
+        }
+    }
+
+    private class Block {
+
+        var start = 0
+        var end = 0
+        var prev: Block? = null
+        var next: Block? = null
+        val branches = mutableListOf<Block>()
+
+        val root: Block get() {
+            var cur = this
+            var last = prev
+            while(last != null) {
+                cur = last
+                last = cur.prev
+            }
+            return cur
+        }
+
+        override fun toString(): String {
+            return "Block(start=$start, end=$end)"
+        }
+    }
+
+    /**
+     * An implementation of the O(n log n) Lengauer-Tarjan algorithm for building the
+     * [dominator tree](http://en.wikipedia.org/wiki/Dominator_%28graph_theory%29)
+     * of a flowgraph.
+     */
+    class DominatorTree<V, E>(graph: DefaultDirectedGraph<V, E>, root: V) {
+        private val graph: DefaultDirectedGraph<V, E>
+
+        /**
+         * Semidominator numbers by block.
+         */
+        private val semi: MutableMap<V?, Int> = HashMap()
+
+        /**
+         * Parents by block.
+         */
+        private val parent: MutableMap<V, V> = HashMap()
+
+        /**
+         * Predecessors by block.
+         */
+        private val pred: SetMultimap<V, V> = HashMultimap.create()
+
+        /**
+         * Blocks in DFS order; used to look up a block from its semidominator
+         * numbering.
+         */
+        private val vertex = ArrayList<V>()
+
+        /**
+         * Blocks by semidominator block.
+         */
+        private val bucket: SetMultimap<V?, V> = HashMultimap.create()
+
+        /**
+         * idominator map, built iteratively.
+         */
+        private val idom: MutableMap<V, V> = HashMap()
+
+        /**
+         * Dominance frontiers of this dominator tree, built on demand.
+         */
+        var dominanceFrontiers: SetMultimap<V, V>? = null
+            /**
+             * Compute and/or fetch the dominance frontiers as a SetMultimap.
+             *
+             * @return a SetMultimap where the set of nodes mapped to each key
+             * node is the set of nodes in the key node's dominance frontier.
+             */
+            get() {
+                if (field == null) {
+                    field = HashMultimap.create()
+                    getDominatorTree() // touch the dominator tree
+                    for (x in reverseTopologicalTraversal()) {
+                        val dfx = field!!.get(x)
+
+                        //  Compute DF(local)
+                        for (y in getSuccessors(x)) {
+                            if (idom[y] !== x) {
+                                dfx.add(y)
                             }
-                            val trueSuccessorName = if(insn.opcode == GOTO) "goto" else "if.then"
-                            val trueSuccessor = insnToBlock.getOrSet(insn.label.index) { BasicBlock(trueSuccessorName) }
-                            block.linkForward(trueSuccessor)
                         }
 
-                        is TableSwitchInsnNode -> {
-                            val defaultBlock = insnToBlock.getOrSet(insn.dflt.index) { BasicBlock("tableswitch.default") }
-                            block.linkForward(defaultBlock)
-
-                            val labels = insn.labels
-                            for(label in labels) {
-                                val labelBlock = insnToBlock.getOrSet(label.index) { BasicBlock("tableswitch") }
-                                block.linkForward(labelBlock)
-                            }
-                        }
-
-                        is LookupSwitchInsnNode -> {
-                            val defaultBlock = insnToBlock.getOrSet(insn.dflt.index) { BasicBlock("lookupswitch.default") }
-                            block.linkForward(defaultBlock)
-
-                            val labels = insn.labels
-                            for(label in labels) {
-                                val labelBlock = insnToBlock.getOrSet(label.index) { BasicBlock("lookupswitch") }
-                                block.linkForward(labelBlock)
-                            }
-                        }
-
-                        else -> {
-                            if(insn.canThrowException() && (insn.next != null)) {
-                                val next = insnToBlock.getOrSet(insnIndex + 1) { BasicBlock("block") }
-                                if(!insn.isTerminator()) {
-                                    block.linkForward(next)
+                        //  Compute DF(up)
+                        for (z in dominatorTree!![x]) {
+                            for (y in field!!.get(z)) {
+                                if (idom[y] !== x) {
+                                    dfx.add(y)
                                 }
                             }
                         }
                     }
                 }
-                insnList.add(insn)
-                addBlock(block)
+                return field
             }
+            private set
 
-            for(insn in method.tryCatchBlocks) {
-                val handlerIndex = insn.handler.index
-                val handler = insnToBlock[handlerIndex] as CatchBlock
-                var curIdx: Int = insn.start.index
+        /**
+         * Dominator tree, built on demand from the idominator map.
+         */
+        private var dominatorTree: SetMultimap<V, V>? = null
 
-                var thrower = insnToBlock[curIdx]!!
-                val throwers = arrayListOf<Block>()
-                while(method.instructions[curIdx] != insn.end) {
-                    block = insnToBlock[curIdx]!!
-                    if(block.name != thrower.name) {
-                        throwers.add(thrower)
-                        thrower.addHandler(handler)
-                        thrower = block
+        /**
+         * Auxiliary data structure used by the O(m log n) eval/link implementation:
+         * ancestor relationships in the forest (the processed tree as it's built
+         * back up).
+         */
+        private val ancestor: MutableMap<V, V> = HashMap()
+
+        /**
+         * Auxiliary data structure used by the O(m log n) eval/link implementation:
+         * node with least semidominator seen during traversal of a path from node
+         * to subtree root in the forest.
+         */
+        private val label: MutableMap<V?, V?> = HashMap()
+
+        /**
+         * A topological traversal of the dominator tree, built on demand.
+         */
+        private var topologicalTraversalImpl: LinkedList<V>? = null
+
+        init {
+            this.graph = graph
+            dfs(root)
+            computeDominators()
+        }
+
+        val idoms: Map<V, V>
+            /**
+             * Create and/or fetch the map of immediate dominators.
+             *
+             * @return the map from each block to its immediate dominator
+             * (if it has one).
+             */
+            get() = idom
+
+        /**
+         * Compute and/or fetch the dominator tree as a SetMultimap.
+         *
+         * @return the dominator tree.
+         */
+        fun getDominatorTree(): SetMultimap<V, V> {
+            if (dominatorTree == null) {
+                dominatorTree = HashMultimap.create<V, V>()
+                for (node in idom.keys) {
+                    dominatorTree!!.get(idom[node]).add(node)
+                }
+            }
+            return dominatorTree!!
+        }
+
+        private fun getSuccessors(v: V): List<V> {
+            return Graphs.successorListOf(graph, v)
+        }
+
+        /**
+         * Create and/or fetch a topological traversal of the dominator tree,
+         * such that for every node, idom(node) appears before node.
+         *
+         * @return the topological traversal of the dominator tree,
+         * as an immutable List.
+         */
+        fun topologicalTraversal(): List<V> {
+            return Collections.unmodifiableList(toplogicalTraversalImplementation)
+        }
+
+        /**
+         * Create and/or fetch a reverse topological traversal of the dominator tree,
+         * such that for every node, node appears before idom(node).
+         *
+         * @return a reverse topological traversal of the dominator tree,
+         * as an immutable List.
+         */
+        fun reverseTopologicalTraversal(): Iterable<V> {
+            return object : Iterable<V> {
+                override fun iterator(): Iterator<V> {
+                    return toplogicalTraversalImplementation.descendingIterator()
+                }
+            }
+        }
+
+        private fun dfs(root: V) {
+            val it = DepthFirstIterator<V, E>(graph, root)
+            while (it.hasNext()) {
+                val node = it.next()
+                if (!semi.containsKey(node)) {
+                    vertex.add(node)
+
+                    //  Initial assumption: the node's semidominator is itself.
+                    semi[node] = semi.size
+                    label[node] = node
+                    for (child in getSuccessors(node)) {
+                        pred[child].add(node)
+                        if (!semi.containsKey(child)) {
+                            parent[child] = node
+                        }
                     }
-                    curIdx++
                 }
-
-                if(thrower !in throwers) {
-                    throwers.add(thrower)
-                    thrower.addHandler(handler)
-                }
-                handler.addThrowers(throwers)
-                addCatchBlock(handler)
             }
         }
 
-        private fun AbstractInsnNode.isTerminator(): Boolean = when(opcode) {
-            TABLESWITCH, LOOKUPSWITCH, GOTO, ATHROW -> true
-            in IRETURN..RETURN -> true
-            else -> false
+        /**
+         * Steps 2, 3, and 4 of Lengauer-Tarjan.
+         */
+        private fun computeDominators() {
+            val lastSemiNumber = semi.size - 1
+            for (i in lastSemiNumber downTo 1) {
+                val w = vertex[i]
+                val p = parent[w]!!
+
+                //  step 2: compute semidominators
+                //  for each v in pred(w)...
+                var semidominator = semi[w]!!
+                for (v in pred[w]) {
+                    semidominator = min(semidominator.toDouble(), semi[eval(v)]!!.toDouble()).toInt()
+                }
+                semi[w] = semidominator
+                bucket[vertex[semidominator]].add(w)
+
+                //  Link w into the forest via its parent, p
+                link(p, w)
+
+                //  step 3: implicitly compute idominators
+                //  for each v in bucket(parent(w)) ...
+                for (v in bucket[p]) {
+                    val u = eval(v)
+                    if (semi[u]!! < semi[v]!!) {
+                        idom[v] = u!!
+                    } else {
+                        idom[v] = p!!
+                    }
+                }
+                bucket[p].clear()
+            }
+
+            // step 4: explicitly compute idominators
+            for (i in 1..lastSemiNumber) {
+                val w = vertex[i]
+                if (idom[w] !== vertex[semi[w]!!]) {
+                    idom[w] = idom[idom[w]]!!
+                }
+            }
         }
 
-        private fun AbstractInsnNode.canThrowException(): Boolean = when(opcode) {
-            in NOP..ALOAD -> false
-            in IALOAD..SALOAD -> true
-            in ISTORE..ASTORE -> false
-            in IASTORE..SASTORE -> true
-            in POP..DMUL -> false
-            in IDIV..DREM -> true
-            in INEG..PUTSTATIC -> false
-            in GETFIELD..INVOKEDYNAMIC -> true
-            NEW -> false
-            in NEWARRAY..CHECKCAST -> true
-            INSTANCEOF -> false
-            in MONITORENTER..MULTIANEWARRAY -> true
-            in IFNULL..IFNONNULL -> false
-            -1 -> false
-            else -> throw IllegalArgumentException("Unknown instruction opcode $opcode.")
-        }
-    }
-
-    abstract class Block(val name: String) {
-
-        val predecessors = linkedSetOf<Block>()
-        val successors = linkedSetOf<Block>()
-        val handlers = hashSetOf<CatchBlock>()
-        val instructions = arrayListOf<AbstractInsnNode>()
-
-        fun addSuccessor(block: Block) {
-            successors.add(block)
+        /**
+         * Extract the node with the least-numbered semidominator in the (processed)
+         * ancestors of the given node.
+         *
+         * @param v - the node of interest.
+         * @return "If v is the root of a tree in the forest, return v. Otherwise,
+         * let r be the root of the tree which contains v. Return any vertex u != r
+         * of miniumum semi(u) on the path r-*v."
+         */
+        private fun eval(v: V): V? {
+            //  This version of Lengauer-Tarjan implements
+            //  eval(v) as a path-compression procedure.
+            compress(v)
+            return label[v]
         }
 
-        fun addPredecessor(block: Block) {
-            predecessors.add(block)
+        /**
+         * Traverse ancestor pointers back to a subtree root, then propagate the
+         * least semidominator seen along this path through the "label" map.
+         */
+        private fun compress(v: V) {
+            val worklist = Stack<V?>()
+            worklist.add(v)
+            var a = ancestor[v]
+
+            //  Traverse back to the subtree root.
+            while (ancestor.containsKey(a)) {
+                worklist.push(a)
+                a = ancestor[a]
+            }
+
+            //  Propagate semidominator information forward.
+            var ancestor = worklist.pop()
+            var leastSemi = semi[label[ancestor]]!!
+            while (!worklist.empty()) {
+                val descendent = worklist.pop()
+                val currentSemi = semi[label[descendent]]!!
+                if (currentSemi > leastSemi) {
+                    label[descendent] = label[ancestor]
+                } else {
+                    leastSemi = currentSemi
+                }
+
+                //  Prepare to process the next iteration.
+                ancestor = descendent
+            }
         }
 
-        fun addHandler(handle: CatchBlock) {
-            handlers.add(handle)
+        /**
+         * Simple version of link(parent,child) simply links the child into the
+         * parent's forest, with no attempt to balance the subtrees or otherwise
+         * optimize searching.
+         */
+        private fun link(parent: V, child: V) {
+            ancestor[child] = parent
         }
 
-        fun linkForward(block: Block) {
-            val current = this
-            current.addSuccessor(block)
-            block.addPredecessor(current)
-        }
-
-        fun linkBackward(block: Block) {
-            val current = this
-            current.addPredecessor(block)
-            block.addSuccessor(current)
-        }
-
-        fun linkThrowing(block: CatchBlock) {
-            val current = this
-            current.addHandler(block)
-            block.addThrower(current)
-        }
-    }
-
-    class BasicBlock(name: String) : Block(name) {
-
-    }
-
-    class CatchBlock(name: String, val type: Type = DEFAULT_EXCEPTION_TYPE) : Block(name) {
-
-        val throwers = hashSetOf<Block>()
-
-        fun addThrower(thrower: Block) {
-            throwers.add(thrower)
-        }
-
-        fun addThrowers(throwers: List<Block>) {
-            throwers.forEach { addThrower(it) }
-        }
-
-        fun linkCatching(thrower: Block) {
-            val current = this
-            current.addThrower(thrower)
-            thrower.addHandler(current)
-        }
-
-        companion object {
-            val DEFAULT_EXCEPTION_TYPE = Type.getType(Throwable::class.java)
-        }
+        private val toplogicalTraversalImplementation: LinkedList<V>
+            /**
+             * Create/fetch the topological traversal of the dominator tree.
+             *
+             * @return [this.topologicalTraversal], the traversal of
+             * the dominator tree such that for any node n with a dominator,
+             * n appears before idom(n).
+             */
+            private get() {
+                if (topologicalTraversalImpl == null) {
+                    topologicalTraversalImpl = LinkedList()
+                    for (node in vertex) {
+                        val idx = topologicalTraversalImpl!!.indexOf(idom[node])
+                        if (idx != -1) {
+                            topologicalTraversalImpl!!.add(idx + 1, node)
+                        } else {
+                            topologicalTraversalImpl!!.add(node)
+                        }
+                    }
+                }
+                return topologicalTraversalImpl!!
+            }
     }
 
 }
