@@ -1,6 +1,5 @@
 package org.spectralpowered.revtools.deobfuscator
 
-import ControlFlowOptimizer
 import org.spectralpowered.revtools.deobfuscator.asm.tree.ClassGroup
 import org.spectralpowered.revtools.deobfuscator.transformer.*
 import java.io.File
@@ -28,8 +27,9 @@ class Deobfuscator(
         register<AddDeobClasses>()
         register<RuntimeExceptionRemover>()
         register<IllegalStateExceptionRemover>()
+        register<RedundantGotoRemover>()
+        register<UnusedTryCatchRemover>()
         register<UniqueRenamer>()
-        register<ControlFlowOptimizer>()
         register<UnusedMethodRemover>()
         register<UnusedArgRemover>()
 

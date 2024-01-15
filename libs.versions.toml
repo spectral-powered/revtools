@@ -9,6 +9,7 @@ guava = "32.1.3-jre"
 jgrapht = "1.5.2"
 jsoup = "1.17.1"
 modant = "2.2.0"
+asm-testkit = "0.1.0"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -20,6 +21,7 @@ asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
 asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asm-testkit = { module = "dev.turingcomplete:asm-testkit", version.ref = "asm-testkit" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 jgrapht = { module = "org.jgrapht:jgrapht-core", version.ref = "jgrapht" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }

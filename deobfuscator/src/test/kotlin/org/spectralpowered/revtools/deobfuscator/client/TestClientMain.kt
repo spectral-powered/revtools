@@ -1,8 +1,9 @@
-package org.spectralpowered.revtools.deobfuscator
+package org.spectralpowered.revtools.deobfuscator.client
 
+import org.spectralpowered.revtools.deobfuscator.Deobfuscator
 import java.io.File
 
-object DeobfuscatorTest {
+object TestClientMain {
 
     @JvmStatic
     fun main(args: Array<String>) {

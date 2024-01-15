@@ -1,9 +1,8 @@
 @file:Suppress("DEPRECATION")
 
-package org.spectralpowered.revtools.deobfuscator
+package org.spectralpowered.revtools.deobfuscator.client
 
 import java.applet.Applet
-import java.applet.AppletContext
 import java.applet.AppletStub
 import java.awt.Color
 import java.awt.Dimension

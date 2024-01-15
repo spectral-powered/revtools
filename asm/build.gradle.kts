@@ -3,9 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.mordant)
-    implementation(libs.bundles.asm)
-    implementation(libs.guava)
+    api(libs.bundles.asm)
     implementation(libs.jgrapht)
+    implementation(libs.guava)
     testImplementation(libs.asm.testkit)
 }
