@@ -10,6 +10,10 @@ jgrapht = "1.5.2"
 jsoup = "1.17.1"
 modant = "2.2.0"
 asm-testkit = "0.1.0"
+graphviz = "0.18.1"
+trove = "3.0.3"
+slf4j = "1.7.36"
+jdot = "1.0"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -23,9 +27,15 @@ asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 asm-testkit = { module = "dev.turingcomplete:asm-testkit", version.ref = "asm-testkit" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
-jgrapht = { module = "org.jgrapht:jgrapht-core", version.ref = "jgrapht" }
+jgrapht-core = { module = "org.jgrapht:jgrapht-core", version.ref = "jgrapht" }
+jgrapht-ext = { module = "org.jgrapht:jgrapht-ext", version.ref = "jgrapht" }
+jgrapht-io = { module = "org.jgrapht:jgrapht-io", version.ref = "jgrapht" }
+graphviz-java = { module = "guru.nidi:graphviz-java-all-j2v8", version.ref = "graphviz" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "modant" }
+trove = { module = "net.sf.trove4j:trove4j", version.ref = "trove" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+jdot = { module = "info.leadinglight:jdot", version.ref = "jdot" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

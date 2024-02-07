@@ -1,9 +1,28 @@
+/*
+ * Copyright (C) 2024 Spectral Powered <https://github.com/spectral-powered>
+ * @author Kyle Escobar <https://github.com/kyle-escobar>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @file:Suppress("DuplicatedCode")
 
 package org.spectralpowered.revtools.deobfuscator.asm.tree
 
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.ClassWriter.*
 import org.objectweb.asm.Opcodes.ACC_ABSTRACT
 import org.objectweb.asm.Opcodes.ACC_INTERFACE
 import org.objectweb.asm.tree.ClassNode
@@ -139,18 +158,23 @@ fun ClassNode.fromInputStream(input: InputStream, flags: Int): ClassNode {
 
 fun ClassNode.fromBytes(bytes: ByteArray, flags: Int) = fromInputStream(bytes.inputStream(), flags)
 
-fun ClassNode.toBytes(flags: Int = ClassWriter.COMPUTE_FRAMES): ByteArray {
-    val writer = AsmClassWriter(group, flags)
+fun ClassNode.toBytes(flags: Int = COMPUTE_FRAMES or COMPUTE_MAXS, checkFlow: Boolean = false): ByteArray {
+    val writer = ClassWriter(0)
     this.accept(writer)
+
     val bytes = writer.toByteArray()
-    try {
-        val flowReader = ClassReader(bytes)
-        val flowWriter = ClassWriter(flowReader, 0)
-        val flowChecker = CheckClassAdapter(flowWriter, true)
-        flowReader.accept(flowChecker, 0)
-    } catch (e: Exception) {
-        Logger.error("Class $name failed data-flow validation.", e)
+
+    if(checkFlow) {
+        try {
+            val reader = ClassReader(bytes)
+            val flowWriter = ClassWriter(reader, 0)
+            val flowChecker = CheckClassAdapter(flowWriter, true)
+            reader.accept(flowChecker, 0)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
+
     return bytes
 }
 

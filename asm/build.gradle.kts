@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api(libs.bundles.asm)
-    implementation(libs.jgrapht)
-    implementation(libs.guava)
+    implementation(libs.slf4j.api)
+    implementation(libs.jdot)
     testImplementation(libs.asm.testkit)
 }
