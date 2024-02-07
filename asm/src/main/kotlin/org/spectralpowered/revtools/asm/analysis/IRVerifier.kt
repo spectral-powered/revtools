@@ -18,17 +18,17 @@
 
 package org.spectralpowered.revtools.asm.analysis
 
-import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.AsmException
+import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.asm.helper.assert.AssertionException
+import org.spectralpowered.revtools.asm.helper.assert.fail
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.ir.*
 import org.spectralpowered.revtools.asm.ir.value.*
 import org.spectralpowered.revtools.asm.ir.value.instruction.Instruction
 import org.spectralpowered.revtools.asm.ir.value.instruction.PhiInst
 import org.spectralpowered.revtools.asm.ir.value.instruction.TerminateInst
 import org.spectralpowered.revtools.asm.visitor.MethodVisitor
-import org.spectralpowered.revtools.asm.helper.assert.AssertionException
-import org.spectralpowered.revtools.asm.helper.assert.fail
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
 
 class InvalidIRException(reason: Throwable) : AsmException(reason)
 
@@ -128,6 +128,7 @@ class IRVerifier(classGroup: ClassGroup) : MethodVisitor {
                 )
                 ktassert(bb.predecessors.isEmpty(), "Catch block ${bb.name} should not have predecessors")
             }
+
             method.entry -> ktassert(bb.predecessors.isEmpty(), "Entry block should not have predecessors")
             else -> {
                 for (it in bb.predecessors) {

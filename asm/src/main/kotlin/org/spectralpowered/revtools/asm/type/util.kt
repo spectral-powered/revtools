@@ -36,12 +36,13 @@ val Type.internalDesc: String
     }
 
 @Suppress("RecursivePropertyAccessor")
-val Type.typeFactory: TypeFactory? get() = when (this) {
-    is PrimitiveType -> null
-    is ClassType -> klass.group.type
-    is ArrayType -> component.typeFactory
-    else -> null
-}
+val Type.typeFactory: TypeFactory?
+    get() = when (this) {
+        is PrimitiveType -> null
+        is ClassType -> klass.group.type
+        is ArrayType -> component.typeFactory
+        else -> null
+    }
 
 fun commonSupertype(types: Set<Type>): Type? = when {
     NullType in types -> {

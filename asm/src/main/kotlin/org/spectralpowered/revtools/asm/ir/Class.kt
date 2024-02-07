@@ -25,11 +25,11 @@ import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.InvalidStateException
 import org.spectralpowered.revtools.asm.Package
 import org.spectralpowered.revtools.asm.UnknownInstanceException
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.type.ClassType
 import org.spectralpowered.revtools.asm.type.SystemTypeNames
 import org.spectralpowered.revtools.asm.type.Type
 import org.spectralpowered.revtools.asm.type.TypeFactory
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
 
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class Class : Node {

@@ -56,5 +56,6 @@ class SwitchInst internal constructor(
         return sb.toString()
     }
 
-    override fun clone(ctx: UsageContext): Instruction = SwitchInst(key, type, default, operands, successors.drop(1), ctx)
+    override fun clone(ctx: UsageContext): Instruction =
+        SwitchInst(key, type, default, operands, successors.drop(1), ctx)
 }

@@ -43,16 +43,21 @@ fun Logger.error() = this.error("")
 fun <T> Logger.error(t: T) = this.error(t.toString())
 
 inline fun Logger.debug(message: () -> String) =
-    if(isDebugEnabled) debug(message()) else {}
+    if (isDebugEnabled) debug(message()) else {
+    }
 
 inline fun Logger.trace(message: () -> String) =
-    if(isTraceEnabled) trace(message()) else {}
+    if (isTraceEnabled) trace(message()) else {
+    }
 
 inline fun Logger.info(message: () -> String) =
-    if(isInfoEnabled) info(message()) else {}
+    if (isInfoEnabled) info(message()) else {
+    }
 
 inline fun Logger.warn(message: () -> String) =
-    if(isWarnEnabled) warn(message()) else {}
+    if (isWarnEnabled) warn(message()) else {
+    }
 
 inline fun Logger.error(message: () -> String) =
-    if(isErrorEnabled) error(message()) else {}
+    if (isErrorEnabled) error(message()) else {
+    }

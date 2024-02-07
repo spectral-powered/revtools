@@ -22,6 +22,9 @@ import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.Type.getType
 import org.objectweb.asm.tree.*
 import org.spectralpowered.revtools.asm.*
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
+import org.spectralpowered.revtools.asm.helper.collection.mapToArray
+import org.spectralpowered.revtools.asm.helper.collection.stackOf
 import org.spectralpowered.revtools.asm.ir.BasicBlock
 import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.ir.MethodDescriptor
@@ -29,9 +32,6 @@ import org.spectralpowered.revtools.asm.ir.value.*
 import org.spectralpowered.revtools.asm.ir.value.instruction.*
 import org.spectralpowered.revtools.asm.type.*
 import org.spectralpowered.revtools.asm.visitor.MethodVisitor
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
-import org.spectralpowered.revtools.asm.helper.collection.mapToArray
-import org.spectralpowered.revtools.asm.helper.collection.stackOf
 import org.objectweb.asm.Handle as AsmHandle
 import org.objectweb.asm.Type as AsmType
 
@@ -128,22 +128,26 @@ class AsmBuilder(override val group: ClassGroup, val method: Method) : MethodVis
             in Short.MIN_VALUE..Short.MAX_VALUE -> IntInsnNode(SIPUSH, constant.value)
             else -> LdcInsnNode(constant.value)
         }
+
         is CharConstant -> LdcInsnNode(constant.value.code)
         is LongConstant -> when (constant.value) {
             in 0..1 -> InsnNode(LCONST_0 + constant.value.toInt())
             else -> LdcInsnNode(constant.value)
         }
+
         is FloatConstant -> when (constant.value) {
             0.0F -> InsnNode(FCONST_0)
             1.0F -> InsnNode(FCONST_1)
             2.0F -> InsnNode(FCONST_2)
             else -> LdcInsnNode(constant.value)
         }
+
         is DoubleConstant -> when (constant.value) {
             0.0 -> InsnNode(DCONST_0)
             1.0 -> InsnNode(DCONST_1)
             else -> LdcInsnNode(constant.value)
         }
+
         is NullConstant -> InsnNode(ACONST_NULL)
         is StringConstant -> LdcInsnNode(constant.value)
         is ClassConstant -> LdcInsnNode(getType(constant.constantType.asmDesc))
@@ -273,6 +277,7 @@ class AsmBuilder(override val group: ClassGroup, val method: Method) : MethodVis
                     is DoubleType -> L2D
                     else -> throwEx()
                 }
+
                 is Integer -> when (targetType) {
                     is LongType -> I2L
                     is FloatType -> I2F
@@ -283,18 +288,21 @@ class AsmBuilder(override val group: ClassGroup, val method: Method) : MethodVis
                     is BoolType -> NOP
                     else -> throwEx()
                 }
+
                 is FloatType -> when (targetType) {
                     is IntType -> F2I
                     is LongType -> F2L
                     is DoubleType -> F2D
                     else -> throwEx()
                 }
+
                 is DoubleType -> when (targetType) {
                     is IntType -> D2I
                     is LongType -> D2L
                     is FloatType -> D2F
                     else -> throwEx()
                 }
+
                 else -> throwEx()
             }
             InsnNode(opcode)
@@ -480,11 +488,13 @@ class AsmBuilder(override val group: ClassGroup, val method: Method) : MethodVis
                     is DoubleType -> DCMPG
                     else -> throw InvalidOperandException("Non-real operands of CMPG inst: ${inst.lhv.type}")
                 }
+
                 CmpOpcode.CMPL -> when (inst.lhv.type) {
                     is FloatType -> FCMPL
                     is DoubleType -> DCMPL
                     else -> throw InvalidOperandException("Non-real operands of CMPL inst: ${inst.lhv.type}")
                 }
+
                 else -> throw InvalidStateException("Unknown non-branch cmp inst ${inst.print()}")
             }
             val insn = InsnNode(opcode)

@@ -18,18 +18,18 @@
 
 package org.spectralpowered.revtools.asm
 
-import org.spectralpowered.revtools.asm.util.Flags
 import org.spectralpowered.revtools.asm.helper.KtException
 import org.spectralpowered.revtools.asm.helper.assert.ktassert
+import org.spectralpowered.revtools.asm.util.Flags
 
 class InvalidAsmConfigException(msg: String) : KtException(msg)
 
 data class AsmConfig(
-        val flags: Flags = Flags.readAll,
-        val useCachingLoopManager: Boolean = false,
-        val failOnError: Boolean = true,
-        val verifyIR: Boolean = false,
-        val checkClasses: Boolean = false
+    val flags: Flags = Flags.readAll,
+    val useCachingLoopManager: Boolean = false,
+    val failOnError: Boolean = true,
+    val verifyIR: Boolean = false,
+    val checkClasses: Boolean = false
 ) {
 
     init {

@@ -18,8 +18,6 @@
 
 package org.spectralpowered.revtools.asm.helper
 
-import java.lang.Exception
-
 @Suppress("unused")
 open class KtException : Exception {
     constructor(message: String) : super(message)

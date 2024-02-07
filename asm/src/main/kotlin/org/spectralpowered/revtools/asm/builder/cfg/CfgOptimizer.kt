@@ -39,8 +39,7 @@ class CfgOptimizer(override val group: ClassGroup, val ctx: UsageContext) : Meth
             if (this.successors.first().predecessors.size != 1) return false
 
             val successor = this.successors.first()
-            if (this.handlers != successor.handlers) return false
-            return true
+            return this.handlers == successor.handlers
         }
 
     override fun visitBody(body: MethodBody) = with(ctx) {

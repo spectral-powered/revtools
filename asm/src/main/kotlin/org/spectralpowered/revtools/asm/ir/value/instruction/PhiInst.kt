@@ -19,13 +19,7 @@
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
 import org.spectralpowered.revtools.asm.ir.BasicBlock
-import org.spectralpowered.revtools.asm.ir.value.BlockUsageContext
-import org.spectralpowered.revtools.asm.ir.value.BlockUser
-import org.spectralpowered.revtools.asm.ir.value.Name
-import org.spectralpowered.revtools.asm.ir.value.UsableBlock
-import org.spectralpowered.revtools.asm.ir.value.UsableValue
-import org.spectralpowered.revtools.asm.ir.value.UsageContext
-import org.spectralpowered.revtools.asm.ir.value.Value
+import org.spectralpowered.revtools.asm.ir.value.*
 import org.spectralpowered.revtools.asm.type.Type
 
 class PhiInst internal constructor(

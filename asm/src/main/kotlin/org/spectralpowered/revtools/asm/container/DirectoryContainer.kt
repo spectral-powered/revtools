@@ -22,19 +22,11 @@ import org.objectweb.asm.tree.ClassNode
 import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.Package
 import org.spectralpowered.revtools.asm.UnsupportedCfgException
-import org.spectralpowered.revtools.asm.ir.Class
-import org.spectralpowered.revtools.asm.ir.ConcreteClass
-import org.spectralpowered.revtools.asm.util.Flags
-import org.spectralpowered.revtools.asm.util.allEntries
-import org.spectralpowered.revtools.asm.util.classLoader
-import org.spectralpowered.revtools.asm.util.hasFrameInfo
-import org.spectralpowered.revtools.asm.util.isClass
-import org.spectralpowered.revtools.asm.util.longestCommonPrefix
-import org.spectralpowered.revtools.asm.util.readClassNode
-import org.spectralpowered.revtools.asm.util.recomputeFrames
-import org.spectralpowered.revtools.asm.util.write
 import org.spectralpowered.revtools.asm.helper.`try`
 import org.spectralpowered.revtools.asm.helper.write
+import org.spectralpowered.revtools.asm.ir.Class
+import org.spectralpowered.revtools.asm.ir.ConcreteClass
+import org.spectralpowered.revtools.asm.util.*
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -115,11 +107,13 @@ class DirectoryContainer(private val file: File, pkg: Package? = null) : Contain
                                 absolutePath.resolve(Paths.get(`class`.pkg.fileSystemPath, "${`class`.name}.class"))
                             `class`.write(group, loader, path, Flags.writeComputeFrames, checkClass)
                         }
+
                         unpackAllClasses -> {
                             val path = absolutePath.resolve(entry.fullClassName)
                             val classNode = readClassNode(entry.inputStream())
                             classNode.write(loader, path, Flags.writeComputeNone, checkClass)
                         }
+
                         else -> Unit
                     }
                 }

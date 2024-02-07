@@ -18,19 +18,11 @@
 
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
+import org.spectralpowered.revtools.asm.helper.assert.asserted
 import org.spectralpowered.revtools.asm.ir.BasicBlock
 import org.spectralpowered.revtools.asm.ir.Location
-import org.spectralpowered.revtools.asm.ir.value.BlockUsageContext
-import org.spectralpowered.revtools.asm.ir.value.BlockUser
-import org.spectralpowered.revtools.asm.ir.value.Name
-import org.spectralpowered.revtools.asm.ir.value.UsableBlock
-import org.spectralpowered.revtools.asm.ir.value.UsableValue
-import org.spectralpowered.revtools.asm.ir.value.UsageContext
-import org.spectralpowered.revtools.asm.ir.value.Value
-import org.spectralpowered.revtools.asm.ir.value.ValueUsageContext
-import org.spectralpowered.revtools.asm.ir.value.ValueUser
+import org.spectralpowered.revtools.asm.ir.value.*
 import org.spectralpowered.revtools.asm.type.Type
-import org.spectralpowered.revtools.asm.helper.assert.asserted
 
 abstract class Instruction internal constructor(
     name: Name,

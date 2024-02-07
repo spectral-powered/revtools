@@ -22,8 +22,8 @@ package org.spectralpowered.revtools.asm.type
 
 import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.Package
-import org.spectralpowered.revtools.asm.ir.Class
 import org.spectralpowered.revtools.asm.helper.assert.unreachable
+import org.spectralpowered.revtools.asm.ir.Class
 import java.lang.Class as JClass
 
 class TypeFactory internal constructor(val group: ClassGroup) {

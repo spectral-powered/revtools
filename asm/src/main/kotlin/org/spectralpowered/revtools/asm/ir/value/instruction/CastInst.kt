@@ -33,6 +33,6 @@ class CastInst internal constructor(
     val operand: Value
         get() = ops[0]
 
-    override fun print()= "$name = (${type.name}) $operand"
+    override fun print() = "$name = (${type.name}) $operand"
     override fun clone(ctx: UsageContext): Instruction = CastInst(name.clone(), type, operand, ctx)
 }

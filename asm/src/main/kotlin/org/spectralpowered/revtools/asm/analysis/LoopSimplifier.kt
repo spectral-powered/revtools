@@ -19,6 +19,8 @@
 package org.spectralpowered.revtools.asm.analysis
 
 import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.asm.helper.KtException
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.BasicBlock
 import org.spectralpowered.revtools.asm.ir.BodyBlock
 import org.spectralpowered.revtools.asm.ir.CatchBlock
@@ -30,8 +32,6 @@ import org.spectralpowered.revtools.asm.ir.value.instruction.PhiInst
 import org.spectralpowered.revtools.asm.ir.value.usageContext
 import org.spectralpowered.revtools.asm.visitor.Loop
 import org.spectralpowered.revtools.asm.visitor.LoopVisitor
-import org.spectralpowered.revtools.asm.helper.KtException
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
 
 @Suppress("unused")
 class LoopSimplifier(override val group: ClassGroup) : LoopVisitor {
@@ -188,7 +188,8 @@ class LoopSimplifier(override val group: ClassGroup) : LoopVisitor {
                         // first we need to find all values from old throwers that are used in catch body
                         // without phis
                         val catchBody = catch.body
-                        val catchExits = catchBody.flatMap { it.successors }.filterTo(mutableSetOf()) { it !in catchBody }
+                        val catchExits =
+                            catchBody.flatMap { it.successors }.filterTo(mutableSetOf()) { it !in catchBody }
                         val bodyOperands = catchBody
                             .asSequence()
                             .flatten()
@@ -219,6 +220,7 @@ class LoopSimplifier(override val group: ClassGroup) : LoopVisitor {
                                             else new.insertBefore(new.first(), newPhiOperand)
                                             newPhiOperand
                                         }
+
                                     else -> operand
                                 }
                             }
@@ -249,6 +251,7 @@ class LoopSimplifier(override val group: ClassGroup) : LoopVisitor {
                             catch -= phi
                         }
                     }
+
                     else -> unreachable("Unexpected combination of catch entries change")
                 }
             }

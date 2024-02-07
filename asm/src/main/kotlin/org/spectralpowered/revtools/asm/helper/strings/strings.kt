@@ -20,7 +20,7 @@
 
 package org.spectralpowered.revtools.asm.helper.strings
 
-import java.util.Locale
+import java.util.*
 
 fun String.kapitalize() =
     this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }

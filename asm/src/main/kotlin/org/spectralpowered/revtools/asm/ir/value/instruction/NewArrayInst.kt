@@ -18,12 +18,12 @@
 
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.ir.value.Name
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.Value
 import org.spectralpowered.revtools.asm.type.ArrayType
 import org.spectralpowered.revtools.asm.type.Type
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
 
 @Suppress("MemberVisibilityCanBePrivate")
 class NewArrayInst internal constructor(

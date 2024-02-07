@@ -19,6 +19,7 @@
 package org.spectralpowered.revtools.asm.builder.cfg
 
 import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.ValueFactory
 import org.spectralpowered.revtools.asm.ir.value.instruction.*
@@ -27,7 +28,6 @@ import org.spectralpowered.revtools.asm.type.BoolType
 import org.spectralpowered.revtools.asm.type.Integer
 import org.spectralpowered.revtools.asm.type.TypeFactory
 import org.spectralpowered.revtools.asm.visitor.MethodVisitor
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
 
 @Suppress("unused")
 class BoolValueAdapter(

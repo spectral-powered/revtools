@@ -18,8 +18,8 @@
 
 package org.spectralpowered.revtools.asm.analysis
 
-import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.AsmException
+import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.instruction.PhiInst
 import org.spectralpowered.revtools.asm.type.Type

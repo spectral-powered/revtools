@@ -19,14 +19,14 @@
 package org.spectralpowered.revtools.asm.visitor
 
 import org.spectralpowered.revtools.asm.ClassGroup
-import org.spectralpowered.revtools.asm.ir.BasicBlock
-import org.spectralpowered.revtools.asm.ir.CatchBlock
-import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.helper.assert.asserted
 import org.spectralpowered.revtools.asm.helper.graph.GraphView
 import org.spectralpowered.revtools.asm.helper.graph.LoopDetector
 import org.spectralpowered.revtools.asm.helper.graph.PredecessorGraph
 import org.spectralpowered.revtools.asm.helper.graph.Viewable
+import org.spectralpowered.revtools.asm.ir.BasicBlock
+import org.spectralpowered.revtools.asm.ir.CatchBlock
+import org.spectralpowered.revtools.asm.ir.Method
 
 interface LoopVisitor : MethodVisitor {
     val preservesLoopInfo get() = false
@@ -149,7 +149,6 @@ class Loop(
             return views.values.toList()
         }
 }
-
 
 
 fun performLoopAnalysis(method: Method): List<Loop> {

@@ -19,6 +19,7 @@
 package org.spectralpowered.revtools.asm.builder.cfg
 
 import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.ir.BasicBlock
 import org.spectralpowered.revtools.asm.ir.BodyBlock
 import org.spectralpowered.revtools.asm.ir.MethodBody
@@ -34,10 +35,10 @@ import org.spectralpowered.revtools.asm.type.Type
 import org.spectralpowered.revtools.asm.type.TypeFactory
 import org.spectralpowered.revtools.asm.type.commonSupertype
 import org.spectralpowered.revtools.asm.visitor.MethodVisitor
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import kotlin.math.abs
 
-class RetvalBuilder(override val group: ClassGroup, override val ctx: UsageContext) : MethodVisitor, InstructionBuilder {
+class RetvalBuilder(override val group: ClassGroup, override val ctx: UsageContext) : MethodVisitor,
+    InstructionBuilder {
     private val returnValues = linkedMapOf<BasicBlock, ReturnInst>()
     override val instructions: InstructionFactory
         get() = group.instruction
@@ -87,7 +88,10 @@ class RetvalBuilder(override val group: ClassGroup, override val ctx: UsageConte
                 val returnValue = when (type) {
                     returnType -> returnValuePhi
                     is Integer -> {
-                        ktassert(returnType is Integer, "Return value type is integral and method return type is $returnType")
+                        ktassert(
+                            returnType is Integer,
+                            "Return value type is integral and method return type is $returnType"
+                        )
 
                         // if return type is Int and return value type is Long (or vice versa), we need casting
                         // otherwise it's fine
@@ -99,6 +103,7 @@ class RetvalBuilder(override val group: ClassGroup, override val ctx: UsageConte
                             returnValuePhi
                         }
                     }
+
                     else -> {
                         val retvalCasted = returnValuePhi.cast("retval.casted", returnType)
                         instructions.add(retvalCasted)

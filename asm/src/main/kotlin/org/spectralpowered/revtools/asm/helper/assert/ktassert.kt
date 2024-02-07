@@ -17,6 +17,7 @@
  */
 
 @file:Suppress("NOTHING_TO_INLINE", "unused")
+
 package org.spectralpowered.revtools.asm.helper.assert
 
 import org.spectralpowered.revtools.asm.helper.KtException
@@ -37,15 +38,19 @@ inline fun <T> asserted(condition: Boolean, message: String, action: () -> T): T
     return action()
 }
 
-inline fun ktassert(cond: Boolean) = if (!cond) throw AssertionException() else {}
+inline fun ktassert(cond: Boolean) = if (!cond) throw AssertionException() else {
+}
 
 inline fun ktassert(cond: Boolean, message: String) = if (!cond) throw AssertionException(
     message
-) else {}
+) else {
+}
+
 inline fun ktassert(cond: Boolean, action: () -> Unit) = if (!cond) {
     action()
     throw AssertionException()
-} else {}
+} else {
+}
 
 inline fun <T> unreachable(message: String): T = fail(message)
 inline fun <T> unreachable(noinline lazyMessage: () -> Any) =

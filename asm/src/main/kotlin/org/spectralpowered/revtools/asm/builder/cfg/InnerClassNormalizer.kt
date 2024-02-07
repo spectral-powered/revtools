@@ -34,7 +34,9 @@ class InnerClassNormalizer(override val group: ClassGroup) : ClassVisitor {
                 iterator.remove()
                 val outer = group[innerClassNode.outerName]
                 val inner = group[innerClassNode.name]
-                if (outer.cn.innerClasses.all { it.name != innerClassNode.name }) outer.cn.innerClasses.add(innerClassNode)
+                if (outer.cn.innerClasses.all { it.name != innerClassNode.name }) outer.cn.innerClasses.add(
+                    innerClassNode
+                )
                 if (inner.cn.outerClass != innerClassNode.outerName) inner.cn.outerClass = innerClassNode.outerName
             }
         }

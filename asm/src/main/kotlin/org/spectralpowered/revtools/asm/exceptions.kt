@@ -21,6 +21,7 @@ package org.spectralpowered.revtools.asm
 abstract class AsmException : Exception {
     constructor() : super()
     constructor(msg: String) : super(msg)
+
     @Suppress("unused")
     constructor(msg: String, reason: Throwable) : super(msg, reason)
     constructor(reason: Throwable) : super(reason)
@@ -41,6 +42,6 @@ class UnknownInstanceException(msg: String) : AsmException(msg)
 
 class UnsupportedOperationException(msg: String) : AsmException(msg)
 
-class UnsupportedCfgException(msg: String): AsmException(msg) {
+class UnsupportedCfgException(msg: String) : AsmException(msg) {
     constructor() : this("")
 }

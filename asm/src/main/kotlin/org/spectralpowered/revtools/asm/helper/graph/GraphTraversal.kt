@@ -21,7 +21,7 @@ package org.spectralpowered.revtools.asm.helper.graph
 import org.spectralpowered.revtools.asm.helper.KtException
 import org.spectralpowered.revtools.asm.helper.collection.queueOf
 import org.spectralpowered.revtools.asm.helper.collection.stackOf
-import java.util.ArrayDeque
+import java.util.*
 
 class NoTopologicalSortingException(msg: String) : KtException(msg)
 

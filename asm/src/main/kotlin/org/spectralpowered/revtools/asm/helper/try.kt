@@ -24,9 +24,11 @@ import org.spectralpowered.revtools.asm.helper.assert.asserted
 
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate")
 class Try<T> internal constructor(val unsafe: Any?) {
-    @PublishedApi internal val failure: Failure? get() = unsafe as? Failure
+    @PublishedApi
+    internal val failure: Failure? get() = unsafe as? Failure
 
-    @PublishedApi internal data class Failure(val exception: Throwable)
+    @PublishedApi
+    internal data class Failure(val exception: Throwable)
 
     companion object {
         fun <T> just(value: T) = Try<T>(value)

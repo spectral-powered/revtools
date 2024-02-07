@@ -96,6 +96,7 @@ class SlotTracker(private val methodBody: MethodBody) {
                 strings[name.name] = result + 1
                 result
             }
+
             is UndefinedName -> undefinedNames++
             else -> -1
         }
@@ -124,6 +125,7 @@ class SlotTracker(private val methodBody: MethodBody) {
                             strings[name.name] = result + 1
                             result
                         }
+
                         else -> -1
                     }
                 }

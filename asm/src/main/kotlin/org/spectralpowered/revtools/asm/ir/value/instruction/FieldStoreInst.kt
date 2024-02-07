@@ -18,11 +18,11 @@
 
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
+import org.spectralpowered.revtools.asm.helper.assert.asserted
 import org.spectralpowered.revtools.asm.ir.Field
 import org.spectralpowered.revtools.asm.ir.value.UndefinedName
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.Value
-import org.spectralpowered.revtools.asm.helper.assert.asserted
 
 @Suppress("MemberVisibilityCanBePrivate")
 class FieldStoreInst : Instruction {

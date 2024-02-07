@@ -18,37 +18,11 @@
 
 package org.spectralpowered.revtools.asm.visitor
 
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.BasicBlock
 import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.ir.MethodBody
-import org.spectralpowered.revtools.asm.ir.value.instruction.ArrayLoadInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.ArrayStoreInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.BinaryInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.BranchInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.CallInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.CastInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.CatchInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.CmpInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.EnterMonitorInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.ExitMonitorInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.FieldLoadInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.FieldStoreInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.InstanceOfInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.Instruction
-import org.spectralpowered.revtools.asm.ir.value.instruction.InvokeDynamicInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.JumpInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.NewArrayInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.NewInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.PhiInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.ReturnInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.SwitchInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.TableSwitchInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.TerminateInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.ThrowInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.UnaryInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.UnknownValueInst
-import org.spectralpowered.revtools.asm.ir.value.instruction.UnreachableInst
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
+import org.spectralpowered.revtools.asm.ir.value.instruction.*
 
 interface MethodVisitor : NodeVisitor {
 
@@ -129,5 +103,5 @@ interface MethodVisitor : NodeVisitor {
     fun visitTableSwitchInst(inst: TableSwitchInst) {}
     fun visitThrowInst(inst: ThrowInst) {}
     fun visitUnreachableInst(inst: UnreachableInst) {}
-    fun visitUnknownValueInst(inst : UnknownValueInst) {}
+    fun visitUnknownValueInst(inst: UnknownValueInst) {}
 }

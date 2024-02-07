@@ -20,14 +20,14 @@
 
 package org.spectralpowered.revtools.asm.ir
 
-import org.spectralpowered.revtools.asm.ir.value.*
-import org.spectralpowered.revtools.asm.ir.value.instruction.Instruction
-import org.spectralpowered.revtools.asm.ir.value.instruction.TerminateInst
-import org.spectralpowered.revtools.asm.type.Type
 import org.spectralpowered.revtools.asm.helper.assert.asserted
 import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.helper.collection.queueOf
 import org.spectralpowered.revtools.asm.helper.graph.PredecessorGraph
+import org.spectralpowered.revtools.asm.ir.value.*
+import org.spectralpowered.revtools.asm.ir.value.instruction.Instruction
+import org.spectralpowered.revtools.asm.ir.value.instruction.TerminateInst
+import org.spectralpowered.revtools.asm.type.Type
 
 sealed class BasicBlock(
     val name: BlockName
@@ -101,6 +101,7 @@ sealed class BasicBlock(
             bb.removePredecessor(ctx, this@BasicBlock)
             true
         }
+
         else -> false
     }
 
@@ -110,6 +111,7 @@ sealed class BasicBlock(
             bb.removeSuccessor(ctx, this@BasicBlock)
             true
         }
+
         else -> false
     }
 
@@ -155,6 +157,7 @@ sealed class BasicBlock(
             handle.removeThrower(this, this@BasicBlock)
             true
         }
+
         else -> false
     }
 

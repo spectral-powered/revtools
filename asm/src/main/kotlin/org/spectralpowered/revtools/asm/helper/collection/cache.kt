@@ -97,6 +97,7 @@ private class DoublyLinkedList<T> {
             tail == null -> head.also {
                 head = null
             }
+
             else -> tail.also {
                 val next = head!!.next
                 next!!.previous = null
@@ -113,11 +114,13 @@ private class DoublyLinkedList<T> {
             tail == null -> head.also {
                 head = null
             }
+
             tail?.previous == head -> tail.also {
                 head!!.next = null
                 tail!!.previous = null
                 tail = null
             }
+
             else -> tail.also {
                 val previous = tail!!.previous
                 previous!!.next = null

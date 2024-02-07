@@ -18,7 +18,7 @@
 
 package org.spectralpowered.revtools.asm.helper.collection
 
-import java.util.AbstractCollection
+import java.util.*
 
 fun <T> stackOf(vararg elements: T) = Stack(elements.toList())
 

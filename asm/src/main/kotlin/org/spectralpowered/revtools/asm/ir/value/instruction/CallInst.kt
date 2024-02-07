@@ -18,6 +18,8 @@
 
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
+import org.spectralpowered.revtools.asm.helper.assert.asserted
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
 import org.spectralpowered.revtools.asm.ir.Class
 import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.ir.value.Name
@@ -25,8 +27,6 @@ import org.spectralpowered.revtools.asm.ir.value.UndefinedName
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.Value
 import org.spectralpowered.revtools.asm.type.VoidType
-import org.spectralpowered.revtools.asm.helper.assert.asserted
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
 
 @Suppress("MemberVisibilityCanBePrivate")
 class CallInst : Instruction {

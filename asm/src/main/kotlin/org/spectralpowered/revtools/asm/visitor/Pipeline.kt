@@ -20,10 +20,10 @@ package org.spectralpowered.revtools.asm.visitor
 
 import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.Package
+import org.spectralpowered.revtools.asm.helper.collection.dequeOf
 import org.spectralpowered.revtools.asm.ir.Class
 import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.ir.Node
-import org.spectralpowered.revtools.asm.helper.collection.dequeOf
 
 abstract class Pipeline(val group: ClassGroup, pipeline: List<NodeVisitor> = arrayListOf()) {
     protected open val pipeline = pipeline.map { it.wrap() }.toMutableList()
@@ -52,6 +52,7 @@ abstract class Pipeline(val group: ClassGroup, pipeline: List<NodeVisitor> = arr
                 visitor.visit(method)
             }
         }
+
         else -> object : ClassVisitor {
             override val group get() = this@Pipeline.group
 
@@ -157,6 +158,7 @@ open class MethodPipeline(
                 }
             }
         }
+
         is MethodVisitor -> object : ClassVisitor {
             override val group get() = this@MethodPipeline.group
 
@@ -171,6 +173,7 @@ open class MethodPipeline(
                 }
             }
         }
+
         else -> this.wrap()
     }
 

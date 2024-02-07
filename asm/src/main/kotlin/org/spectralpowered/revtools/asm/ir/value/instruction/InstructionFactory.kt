@@ -19,17 +19,8 @@
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
 import org.spectralpowered.revtools.asm.ClassGroup
-import org.spectralpowered.revtools.asm.ir.BasicBlock
-import org.spectralpowered.revtools.asm.ir.Class
-import org.spectralpowered.revtools.asm.ir.Field
-import org.spectralpowered.revtools.asm.ir.Location
-import org.spectralpowered.revtools.asm.ir.Method
-import org.spectralpowered.revtools.asm.ir.MethodDescriptor
-import org.spectralpowered.revtools.asm.ir.value.Name
-import org.spectralpowered.revtools.asm.ir.value.Slot
-import org.spectralpowered.revtools.asm.ir.value.StringName
-import org.spectralpowered.revtools.asm.ir.value.UsageContext
-import org.spectralpowered.revtools.asm.ir.value.Value
+import org.spectralpowered.revtools.asm.ir.*
+import org.spectralpowered.revtools.asm.ir.value.*
 import org.spectralpowered.revtools.asm.type.ArrayType
 import org.spectralpowered.revtools.asm.type.Type
 

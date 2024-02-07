@@ -22,12 +22,12 @@ import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.FrameNode
 import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.TypeInsnNode
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.Method
 import org.spectralpowered.revtools.asm.ir.value.Value
 import org.spectralpowered.revtools.asm.type.Type
 import org.spectralpowered.revtools.asm.type.TypeFactory
 import org.spectralpowered.revtools.asm.type.parseDescOrNull
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import java.util.*
 
 private object TopType : Type() {

@@ -135,12 +135,19 @@ class ClassGroup private constructor(val config: AsmConfig = AsmConfigBuilder().
     val failOnError: Boolean get() = config.failOnError
     val verifyIR: Boolean get() = config.verifyIR
 
-    private val classes = hashMapOf<String, Class>()
+    private val _classes = hashMapOf<String, Class>()
     private val outerClasses = hashMapOf<String, Class>()
+    private val _ignoredClasses = hashMapOf<String, Class>()
     private val container2class = hashMapOf<Container, MutableSet<Class>>()
 
-    val concreteClasses: Set<ConcreteClass>
-        get() = classes.values.filterIsInstanceTo(mutableSetOf())
+    val allClasses: Set<ConcreteClass>
+        get() = _classes.values.filterIsInstanceTo(mutableSetOf())
+
+    val ignoredClasses: Set<ConcreteClass>
+        get() = allClasses.filter { _ignoredClasses.containsValue(it) }.filterIsInstanceTo(mutableSetOf())
+
+    val classes: Set<ConcreteClass>
+        get() = _classes.values.filter { !_ignoredClasses.containsValue(it) }.filterIsInstanceTo(mutableSetOf())
 
     fun initialize(loader: ClassLoader, vararg containers: Container) {
         initialize(loader, containers.toList())
@@ -164,26 +171,26 @@ class ClassGroup private constructor(val config: AsmConfig = AsmConfigBuilder().
         for ((container, classNodes) in container2ClassNode) {
             classNodes.forEach { (name, cn) ->
                 val klass = ConcreteClass(this, cn)
-                classes[name] = klass
+                _classes[name] = klass
                 container2class.getOrPut(container, ::mutableSetOf).add(klass)
             }
         }
-        for (klass in classes.values) {
+        for (klass in _classes.values) {
             InnerClassNormalizer(this).visit(klass)
         }
-        classes.values.forEach { it.init() }
+        _classes.values.forEach { it.init() }
     }
 
-    operator fun get(name: String): Class = classes[name] ?: outerClasses.getOrPut(name) {
+    operator fun get(name: String): Class = _classes[name] ?: outerClasses.getOrPut(name) {
         val pkg = Package.parse(name.substringBeforeLast(Package.SEPARATOR))
         val klassName = name.substringAfterLast(Package.SEPARATOR)
         OuterClass(this, pkg, klassName)
     }
 
-    fun getByPackage(`package`: Package): List<Class> = concreteClasses.filter { `package`.isParent(it.pkg) }
+    fun getByPackage(`package`: Package): List<Class> = allClasses.filter { `package`.isParent(it.pkg) }
 
     fun getSubtypesOf(klass: Class): Set<Class> =
-        concreteClasses.filterTo(mutableSetOf()) { it.isInheritorOf(klass) && it != klass }
+        allClasses.filterTo(mutableSetOf()) { it.isInheritorOf(klass) && it != klass }
 
     fun getAllSubtypesOf(klass: Class): Set<Class> {
         val result = mutableSetOf(klass)
@@ -206,10 +213,17 @@ class ClassGroup private constructor(val config: AsmConfig = AsmConfigBuilder().
         modifiers: Modifiers = Modifiers(0)
     ): Class {
         val klass = ConcreteClass(this, pkg, name, modifiers)
-        classes[klass.fullName] = klass
+        _classes[klass.fullName] = klass
         container2class.getOrPut(container, ::mutableSetOf).add(klass)
         return klass
     }
 
     fun getContainerClasses(container: Container): Set<Class> = container2class.getOrDefault(container, emptySet())
+
+    fun ignoreClass(klass: ConcreteClass): Boolean {
+        if (ignoredClasses.contains(klass)) return false
+        if (!classes.contains(klass)) return false
+        _ignoredClasses[klass.fullName] = klass
+        return true
+    }
 }

@@ -20,9 +20,15 @@ package org.spectralpowered.revtools.asm.ir
 
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.MethodNode
-import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.AsmException
+import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.builder.cfg.CfgBuilder
+import org.spectralpowered.revtools.asm.helper.KtException
+import org.spectralpowered.revtools.asm.helper.assert.ktassert
+import org.spectralpowered.revtools.asm.helper.collection.queueOf
+import org.spectralpowered.revtools.asm.helper.graph.GraphView
+import org.spectralpowered.revtools.asm.helper.graph.PredecessorGraph
+import org.spectralpowered.revtools.asm.helper.graph.Viewable
 import org.spectralpowered.revtools.asm.ir.value.BlockUsageContext
 import org.spectralpowered.revtools.asm.ir.value.BlockUser
 import org.spectralpowered.revtools.asm.ir.value.SlotTracker
@@ -31,12 +37,6 @@ import org.spectralpowered.revtools.asm.type.Type
 import org.spectralpowered.revtools.asm.type.TypeFactory
 import org.spectralpowered.revtools.asm.type.parseMethodDesc
 import org.spectralpowered.revtools.asm.util.jsrInlined
-import org.spectralpowered.revtools.asm.helper.KtException
-import org.spectralpowered.revtools.asm.helper.assert.ktassert
-import org.spectralpowered.revtools.asm.helper.collection.queueOf
-import org.spectralpowered.revtools.asm.helper.graph.GraphView
-import org.spectralpowered.revtools.asm.helper.graph.PredecessorGraph
-import org.spectralpowered.revtools.asm.helper.graph.Viewable
 
 data class MethodDescriptor(
     val args: List<Type>,
@@ -321,7 +321,16 @@ class Method : Node {
                 MethodParameterAnnotation.get(annotationNode, group)
             }
 
-            add(Parameter(group, index, param?.name ?: "", desc.args[index], Modifiers(param?.access ?: 0), annotations))
+            add(
+                Parameter(
+                    group,
+                    index,
+                    param?.name ?: "",
+                    desc.args[index],
+                    Modifiers(param?.access ?: 0),
+                    annotations
+                )
+            )
         }
     }
 

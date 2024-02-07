@@ -48,7 +48,7 @@ class NullLogger : Logger {
     override fun debug(p0: Marker?, p1: String?, p2: Any?, p3: Any?) {}
     override fun debug(p0: Marker?, p1: String?, vararg p2: Any?) {}
     override fun debug(p0: Marker?, p1: String?, p2: Throwable?) {}
-    override fun isInfoEnabled(): Boolean  = false
+    override fun isInfoEnabled(): Boolean = false
     override fun isInfoEnabled(p0: Marker?): Boolean = false
     override fun info(p0: String?) {}
     override fun info(p0: String?, p1: Any?) {}

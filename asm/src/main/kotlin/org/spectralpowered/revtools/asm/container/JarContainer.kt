@@ -22,20 +22,10 @@ import org.objectweb.asm.tree.ClassNode
 import org.spectralpowered.revtools.asm.ClassGroup
 import org.spectralpowered.revtools.asm.Package
 import org.spectralpowered.revtools.asm.UnsupportedCfgException
+import org.spectralpowered.revtools.asm.helper.`try`
 import org.spectralpowered.revtools.asm.ir.Class
 import org.spectralpowered.revtools.asm.ir.ConcreteClass
-import org.spectralpowered.revtools.asm.util.Flags
-import org.spectralpowered.revtools.asm.util.JarBuilder
-import org.spectralpowered.revtools.asm.util.classLoader
-import org.spectralpowered.revtools.asm.util.hasFrameInfo
-import org.spectralpowered.revtools.asm.util.isClass
-import org.spectralpowered.revtools.asm.util.isManifest
-import org.spectralpowered.revtools.asm.util.longestCommonPrefix
-import org.spectralpowered.revtools.asm.util.pkg
-import org.spectralpowered.revtools.asm.util.readClassNode
-import org.spectralpowered.revtools.asm.util.recomputeFrames
-import org.spectralpowered.revtools.asm.util.write
-import org.spectralpowered.revtools.asm.helper.`try`
+import org.spectralpowered.revtools.asm.util.*
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Path
@@ -137,14 +127,17 @@ class JarContainer(override val path: Path, pkg: Package? = null) : Container {
                     visitedClasses += `class`
                     when {
                         pkg.isParent(entry.pkg) && `class` is ConcreteClass -> {
-                            val path = absolutePath.resolve(Paths.get(`class`.pkg.fileSystemPath, "${`class`.name}.class"))
+                            val path =
+                                absolutePath.resolve(Paths.get(`class`.pkg.fileSystemPath, "${`class`.name}.class"))
                             `class`.write(group, loader, path, Flags.writeComputeFrames, checkClass)
                         }
+
                         unpackAllClasses -> {
                             val path = absolutePath.resolve(entry.name)
                             val classNode = readClassNode(file.getInputStream(entry))
                             classNode.write(loader, path, Flags.writeComputeNone, checkClass)
                         }
+
                         else -> Unit
                     }
                 }

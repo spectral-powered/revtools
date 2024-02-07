@@ -18,12 +18,12 @@
 
 package org.spectralpowered.revtools.asm.ir.value.instruction
 
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.value.UndefinedName
 import org.spectralpowered.revtools.asm.ir.value.UsageContext
 import org.spectralpowered.revtools.asm.ir.value.Value
 import org.spectralpowered.revtools.asm.type.ArrayType
 import org.spectralpowered.revtools.asm.type.Type
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
 
 class ArrayStoreInst internal constructor(
     arrayRef: Value,

@@ -19,22 +19,10 @@
 package org.spectralpowered.revtools.asm.ir.value
 
 import org.spectralpowered.revtools.asm.ClassGroup
+import org.spectralpowered.revtools.asm.helper.assert.unreachable
 import org.spectralpowered.revtools.asm.ir.Class
 import org.spectralpowered.revtools.asm.ir.Method
-import org.spectralpowered.revtools.asm.type.BoolType
-import org.spectralpowered.revtools.asm.type.ByteType
-import org.spectralpowered.revtools.asm.type.CharType
-import org.spectralpowered.revtools.asm.type.DoubleType
-import org.spectralpowered.revtools.asm.type.FloatType
-import org.spectralpowered.revtools.asm.type.IntType
-import org.spectralpowered.revtools.asm.type.LongType
-import org.spectralpowered.revtools.asm.type.Reference
-import org.spectralpowered.revtools.asm.type.ShortType
-import org.spectralpowered.revtools.asm.type.Type
-import org.spectralpowered.revtools.asm.type.classType
-import org.spectralpowered.revtools.asm.type.parseDescOrNull
-import org.spectralpowered.revtools.asm.type.stringType
-import org.spectralpowered.revtools.asm.helper.assert.unreachable
+import org.spectralpowered.revtools.asm.type.*
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class ValueFactory internal constructor(val group: ClassGroup) {
@@ -51,6 +39,7 @@ class ValueFactory internal constructor(val group: ClassGroup) {
         get() = getBool(true)
     val falseConstant: Value
         get() = getBool(false)
+
     fun getBool(value: Boolean): Value = BoolConstant(value, types.boolType)
     fun getByte(value: Byte): Value = ByteConstant(value, types.byteType)
     fun getChar(value: Char): Value = CharConstant(value, types.charType)
@@ -65,7 +54,7 @@ class ValueFactory internal constructor(val group: ClassGroup) {
     fun getClass(type: Type): Value = ClassConstant(types.classType, type)
     fun getMethod(method: Method): Value = MethodConstant(method, types.getRefType("java/lang/invoke/MethodHandle"))
 
-    fun getZero(type: Type): Value = when(type) {
+    fun getZero(type: Type): Value = when (type) {
         is BoolType -> getBool(false)
         is ByteType -> getByte(0.toByte())
         is CharType -> getChar(0.toChar())

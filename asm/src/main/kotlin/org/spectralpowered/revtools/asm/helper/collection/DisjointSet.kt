@@ -40,7 +40,8 @@ class Subset<T : Any>(val data: T?) {
 }
 
 @Suppress("unused")
-class DisjointSet<T : Any>(private val children: MutableSet<Subset<T>> = mutableSetOf()) : MutableSet<Subset<T>> by children {
+class DisjointSet<T : Any>(private val children: MutableSet<Subset<T>> = mutableSetOf()) :
+    MutableSet<Subset<T>> by children {
     fun find(element: Subset<T>) = element.getRoot()
     fun findUnsafe(element: Subset<T>?) = element?.getRoot()
 
@@ -50,10 +51,12 @@ class DisjointSet<T : Any>(private val children: MutableSet<Subset<T>> = mutable
             this.parent = other
             other
         }
+
         this.rank > other.rank -> {
             other.parent = this
             this
         }
+
         else -> {
             other.parent = this
             ++this.rank
