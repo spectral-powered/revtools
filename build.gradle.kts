@@ -1,9 +1,8 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    application
+    alias(libs.plugins.kotlin.jvm) apply(false)
+    `java-library`
 }
 
 tasks.wrapper {
@@ -11,67 +10,27 @@ tasks.wrapper {
 }
 
 allprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
     group = "org.spectralpowered.revtools"
     version = "0.1.0"
 
-    repositories {
-        mavenCentral()
+    dependencies {
+        //implementation(libs.bundles.kotlin)
     }
 
-    afterEvaluate {
-        if(pluginManager.hasPlugin(libs.plugins.kotlin.jvm.get().pluginId)) {
-            dependencies {
-                implementation(libs.bundles.kotlin)
-                testImplementation(libs.bundles.kotest)
-            }
-
-            tasks.withType<Test> {
-                useJUnitPlatform()
-            }
-
-            tasks.withType<KotlinCompile> {
-                kotlinOptions {
-                    compilerOptions {
-                        languageVersion.set(KotlinVersion.KOTLIN_1_9)
-                        apiVersion.set(KotlinVersion.KOTLIN_1_9)
-                    }
-                }
-            }
-
-            kotlin {
-                jvmToolchain {
-                    vendor.set(JvmVendorSpec.ADOPTIUM)
-                    languageVersion.set(JavaLanguageVersion.of(libs.versions.jvm.get()))
-                }
-            }
+    tasks.withType(KotlinCompile::class).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
         }
     }
-}
 
-dependencies {
-    implementation(projects.deobfuscator)
-    implementation(libs.clikt)
-    implementation(libs.jsoup)
-}
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of("17"))
+            vendor.set(JvmVendorSpec.ORACLE)
+        }
+    }
 
-application {
-    mainClass.set("org.spectralpowered.revtools.MainKt")
-}
 
-tasks.register("download-gamepack", JavaExec::class) {
-    dependsOn(tasks.run.get().dependsOn)
-    group = "revtools"
-    mainClass.set(tasks.run.get().mainClass.get())
-    classpath = tasks.run.get().classpath
-    workingDir = rootProject.projectDir
-    args = mutableListOf("download", "build/deob/gamepack.jar")
-}
-
-tasks.register("deobfuscate", JavaExec::class) {
-    dependsOn(tasks.run.get().dependsOn)
-    group = "revtools"
-    mainClass.set(tasks.run.get().mainClass.get())
-    classpath = tasks.run.get().classpath
-    workingDir = rootProject.projectDir
-    args = mutableListOf("deobfuscate", "build/deob/gamepack.jar", "build/deob/gamepack.deob.jar")
 }

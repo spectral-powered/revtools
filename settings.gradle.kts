@@ -1,28 +1,18 @@
-import org.gradle.api.internal.FeaturePreviews.Feature.TYPESAFE_PROJECT_ACCESSORS
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
-}
+@file:Suppress("UnstableApiUsage")
 
 dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("libs.versions.toml"))
-        }
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        mavenLocal()
     }
 }
 
-enableFeaturePreview(TYPESAFE_PROJECT_ACCESSORS.name)
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+    id("de.fayard.refreshVersions") version "0.60.5"
+}
 
 rootProject.name = "revtools"
 
-/**
- * === START MODULES ===
- */
-
-include(":asm")
-include(":deobfuscator")
-
-/**
- * === END MODULES ===
- */
+include("asm")
