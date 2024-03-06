@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.tree
+package org.spectralpowered.revtools
 
 import org.objectweb.asm.tree.ClassNode
 import java.io.File
@@ -117,10 +117,12 @@ class ClassPool {
                 jos.write(cls.toBytes())
                 jos.closeEntry()
             }
-            for((resName, resBytes) in resourceMap) {
-                jos.putNextEntry(JarEntry(resName))
-                jos.write(resBytes)
-                jos.closeEntry()
+            if(includeResources) {
+                for((resName, resBytes) in resourceMap) {
+                    jos.putNextEntry(JarEntry(resName))
+                    jos.write(resBytes)
+                    jos.closeEntry()
+                }
             }
         }
     }

@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.gradle.api.internal.FeaturePreviews.Feature.TYPESAFE_PROJECT_ACCESSORS
+
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -13,6 +15,8 @@ plugins {
     id("de.fayard.refreshVersions") version "0.60.5"
 }
 
+enableFeaturePreview(TYPESAFE_PROJECT_ACCESSORS.name)
+
 rootProject.name = "revtools"
 
-include("asm")
+include("logger", "asm")

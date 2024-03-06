@@ -16,21 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.tree
+package org.spectralpowered.revtools
 
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.MethodNode
-import org.spectralpowered.revtools.util.*
-import org.spectralpowered.revtools.util.isAbstract
-import org.spectralpowered.revtools.util.isInterface
+import org.objectweb.asm.tree.FieldNode
+import org.spectralpowered.revtools.util.field
 import org.spectralpowered.revtools.util.isPrivate
+import org.spectralpowered.revtools.util.isStatic
 
-var MethodNode.cls: ClassNode by field()
-val MethodNode.pool get() = cls.pool
+var FieldNode.cls: ClassNode by field()
+val FieldNode.pool get() = cls.pool
 
-val MethodNode.key get() = "${cls.key}.$name$desc"
+val FieldNode.key get() = "${cls.key}.$name"
 
-fun MethodNode.isPrivate() = access.isPrivate()
-fun MethodNode.isAbstract() = access.isAbstract()
-fun MethodNode.isInterface() = access.isInterface()
-fun MethodNode.isStatic() = access.isStatic()
+fun FieldNode.isPrivate() = access.isPrivate()
+fun FieldNode.isStatic() = access.isStatic()
