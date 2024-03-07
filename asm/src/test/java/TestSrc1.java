@@ -29,4 +29,15 @@ public class TestSrc1 {
     public static void staticMethod() {
         System.out.println("Static method called");
     }
+
+    public void expr1() {
+        int a = 10;
+        int b = 20;
+        int c = 200;
+        if(a * b != c) {
+            System.out.println("Bad" + a);
+        } else {
+            System.out.println("Good");
+        }
+    }
 }

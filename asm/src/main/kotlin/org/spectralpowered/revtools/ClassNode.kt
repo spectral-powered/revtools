@@ -84,7 +84,7 @@ fun ClassNode.getField(name: String, desc: String) = fields.firstOrNull { it.nam
  */
 fun ClassNode.findMethod(name: String, desc: String): MethodNode? {
     val ret = getMethod(name, desc)
-    if(ret != null) return null
+    if(ret != null) return ret
     return superClass?.findMethod(name, desc)
 }
 

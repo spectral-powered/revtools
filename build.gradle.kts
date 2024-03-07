@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.22" apply(false)
     `java-library`
+    application
 }
 
 tasks.wrapper {
@@ -16,11 +17,12 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven(url = "https://jitpack.io/")
         mavenLocal()
     }
 }
 
-subprojects {
+allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
@@ -39,5 +41,42 @@ subprojects {
             languageVersion.set(JavaLanguageVersion.of(17))
             vendor.set(JvmVendorSpec.AZUL)
         }
+    }
+}
+
+application {
+    mainClass.set("org.spectralpowered.revtools.MainKt")
+}
+
+dependencies {
+    implementation(projects.downloader)
+    implementation(projects.deobfuscator)
+    implementation("com.github.ajalt:clikt:_")
+}
+
+tasks {
+    val run by existing(JavaExec::class) {
+        group = "other"
+        workingDir = rootProject.projectDir
+    }
+
+    register("download-gamepack") {
+        group = "revtools"
+        doFirst {
+            run.configure {
+                args = listOf("download", "-o", "build/revtools/gamepack.jar")
+            }
+        }
+        finalizedBy(run)
+    }
+
+    register("deobfuscate") {
+        group = "revtools"
+        doFirst {
+            run.configure {
+                args = listOf("deobfuscate", "build/revtools/gamepack.jar", "build/revtools/gamepack.deob.jar", "-tc")
+            }
+        }
+        finalizedBy(run)
     }
 }

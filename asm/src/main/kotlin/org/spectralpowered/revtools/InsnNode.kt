@@ -18,7 +18,12 @@
 
 package org.spectralpowered.revtools
 
+import org.objectweb.asm.Label
 import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.FrameNode
+import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.LineNumberNode
+import org.objectweb.asm.util.Printer
 
 val AbstractInsnNode.nextReal: AbstractInsnNode? get() {
     var insn = next
@@ -50,4 +55,11 @@ val AbstractInsnNode.previousVirtual: AbstractInsnNode? get() {
         insn = insn.next
     }
     return insn
+}
+
+fun AbstractInsnNode.toOpcodeString(): String = when(this) {
+    is LabelNode -> "LABEL"
+    is LineNumberNode -> "LINE($line)"
+    is FrameNode -> "FRAME"
+    else -> Printer.OPCODES[opcode]
 }

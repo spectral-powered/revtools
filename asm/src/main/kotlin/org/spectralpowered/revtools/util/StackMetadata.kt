@@ -31,7 +31,8 @@ data class StackMetadata(val pops: Int, val pushes: Int) {
     var wide = false
 }
 
-operator fun StackMetadata.inc(): StackMetadata = this.also { it.wide = true }
+operator fun StackMetadata.invoke(wide: Boolean) = this.also { it.wide = wide }
+fun StackMetadata.wide(): StackMetadata = this.also { it.wide = true }
 
 private val NONE = StackMetadata(0, 0)
 private val POP1 = StackMetadata(1, 0)
@@ -230,19 +231,21 @@ val AbstractInsnNode.stackMetadata: StackMetadata
             val argumentsAndReturnSizes = Type.getArgumentsAndReturnSizes(desc)
             val pushes = argumentsAndReturnSizes and 0x3
             var pops = argumentsAndReturnSizes shr 2
-            if (opcode != Opcodes.INVOKESTATIC) {
-                pops++
+            if (opcode == Opcodes.INVOKESTATIC) {
+                pops--
             }
             StackMetadata(pops, pushes)
         }
 
         is InvokeDynamicInsnNode -> {
-            val argsAndReturnSizes = Type.getArgumentsAndReturnSizes(desc)
-            val pushes = if ((argsAndReturnSizes and 0x03) > 0) 1 else 0
-            val pops = argsAndReturnSizes shr 2
+            val argumentsAndReturnSizes = Type.getArgumentsAndReturnSizes(desc)
+            val pushes = argumentsAndReturnSizes and 0x3
+            var pops = argumentsAndReturnSizes shr 2
+            if (opcode == Opcodes.INVOKEDYNAMIC) {
+                pops--
+            }
             StackMetadata(pops, pushes)
         }
-
         is MultiANewArrayInsnNode -> StackMetadata(dims, 1)
         else -> SIMPLE_OPCODES[opcode] ?: throw IllegalArgumentException()
     }

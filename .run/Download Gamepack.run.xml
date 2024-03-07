@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Download Gamepack" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="org.spectralpowered.revtools.MainKt" />
+    <module name="revtools.main" />
+    <option name="PROGRAM_PARAMETERS" value="download -o &quot;build/revtools/gamepack.jar&quot;" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

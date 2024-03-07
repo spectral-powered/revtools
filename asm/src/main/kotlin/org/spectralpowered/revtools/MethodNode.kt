@@ -22,6 +22,7 @@ import org.objectweb.asm.Opcodes.ACC_ABSTRACT
 import org.objectweb.asm.Opcodes.ACC_NATIVE
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
+import org.spectralpowered.revtools.expr.ExprTree
 import org.spectralpowered.revtools.util.*
 import org.spectralpowered.revtools.util.isAbstract
 import org.spectralpowered.revtools.util.isInterface
@@ -38,3 +39,5 @@ fun MethodNode.isInterface() = access.isInterface()
 fun MethodNode.isStatic() = access.isStatic()
 
 fun MethodNode.hasCode(): Boolean = access and (ACC_NATIVE or ACC_ABSTRACT) == 0
+
+val MethodNode.exprs: ExprTree get() = ExprTree.build(this)

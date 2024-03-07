@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deobfuscate [bytecode, ast]" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="org.spectralpowered.revtools.MainKt" />
+    <module name="revtools.main" />
+    <option name="PROGRAM_PARAMETERS" value="deobfuscate build/revtools/gamepack.jar build/revtools/gamepack.deob.jar -na -tc" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
