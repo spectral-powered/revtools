@@ -21,6 +21,7 @@ package org.spectralpowered.revtools
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.spectralpowered.revtools.util.field
+import org.spectralpowered.revtools.util.isFinal
 import org.spectralpowered.revtools.util.isPrivate
 import org.spectralpowered.revtools.util.isStatic
 
@@ -31,3 +32,4 @@ val FieldNode.key get() = "${cls.key}.$name"
 
 fun FieldNode.isPrivate() = access.isPrivate()
 fun FieldNode.isStatic() = access.isStatic()
+fun FieldNode.isFinal() = access.isFinal()

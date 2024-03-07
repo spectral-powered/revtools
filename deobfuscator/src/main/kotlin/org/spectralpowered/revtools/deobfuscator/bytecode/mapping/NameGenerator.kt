@@ -16,15 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.decompiler
+package org.spectralpowered.revtools.deobfuscator.bytecode.mapping
 
-import org.objectweb.asm.tree.ClassNode
-import java.io.File
+class NameGenerator {
 
-interface Decompiler {
+    private val prefixes = mutableMapOf<String, Int>()
 
-    fun decompileJar(sourceJar: File, outputZip: File)
+    fun generate(prefix: String): String {
+        val separator = if(prefix.last().isDigit()) "_" else ""
+        val index = prefixes.merge(prefix, 1, Integer::sum)
+        return prefix + separator + index
+    }
 
-    fun decompileClassNode(cls: ClassNode): String
-
+    companion object {
+        fun String.isRenamable(): Boolean {
+            return (this.length <= 2) || (this.length == 3 && this !in listOf("add", "put", "set", "get", "run"))
+        }
+    }
 }

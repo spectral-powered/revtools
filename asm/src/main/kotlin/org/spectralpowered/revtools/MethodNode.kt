@@ -41,3 +41,4 @@ fun MethodNode.isStatic() = access.isStatic()
 fun MethodNode.hasCode(): Boolean = access and (ACC_NATIVE or ACC_ABSTRACT) == 0
 
 val MethodNode.exprs: ExprTree get() = ExprTree.build(this)
+val MethodNode.overrides get() = cls.findInheritedMethods(name, desc)

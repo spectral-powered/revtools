@@ -18,7 +18,10 @@
 
 package org.spectralpowered.revtools
 
+import org.objectweb.asm.commons.Remapper
 import org.objectweb.asm.tree.ClassNode
+import org.spectralpowered.revtools.remap.NameMap
+import org.spectralpowered.revtools.remap.remap
 import java.io.File
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -97,7 +100,7 @@ class ClassPool {
                     cls.classType = ClassType.RESOLVED
                     addClass(cls)
                 } else {
-                    resourceMap[name] = bytes
+                    addResource(name, bytes)
                 }
             }
         }
@@ -131,4 +134,19 @@ class ClassPool {
         for(cls in allClasses) cls.reset()
         for(cls in allClasses) cls.init()
     }
+
+    fun clear() {
+        classMap.clear()
+        ignoredClassMap.clear()
+        runtimeClassMap.clear()
+        resourceMap.clear()
+    }
+
+    fun remap(remapper: Remapper) {
+        for(cls in classes) {
+            cls.remap(remapper)
+        }
+    }
+
+    fun remap(nameMap: NameMap) = remap(nameMap.toRemapper())
 }

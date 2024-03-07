@@ -18,25 +18,27 @@
 
 package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 
-import org.objectweb.asm.Type
+import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.analysis.Analyzer
+import org.objectweb.asm.tree.analysis.BasicInterpreter
 import org.spectralpowered.revtools.ClassPool
 import org.spectralpowered.revtools.deobfuscator.bytecode.BytecodeTransformer
 import org.tinylog.kotlin.Logger
-import java.lang.RuntimeException
 
-class RuntimeExceptionTransformer : BytecodeTransformer {
+class DeadCodeTransformer : BytecodeTransformer {
 
     private var count = 0
 
     override fun run(pool: ClassPool) {
         for(cls in pool.classes) {
             for(method in cls.methods) {
-                val tcbs = method.tryCatchBlocks.iterator()
-                while(tcbs.hasNext()) {
-                    val tcb = tcbs.next()
-                    if(tcb.type == Type.getInternalName(RuntimeException::class.java)) {
-                        tcbs.remove()
-                        count++
+                val insns = method.instructions.toArray()
+                val frames = Analyzer(BasicInterpreter()).analyze(cls.name, method)
+                for(i in insns.indices) {
+                    val frame = frames[i]
+                    if(frame == null) {
+                        if(insns[i] is LabelNode) count++
+                        method.instructions.remove(insns[i])
                     }
                 }
             }
@@ -44,6 +46,6 @@ class RuntimeExceptionTransformer : BytecodeTransformer {
     }
 
     override fun postRun() {
-        Logger.info("Removed $count 'RuntimeException' try-catch blocks.")
+        Logger.info("Removed $count dead-code blocks.")
     }
 }

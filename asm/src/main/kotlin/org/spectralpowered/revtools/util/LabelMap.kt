@@ -16,15 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.decompiler
+package org.spectralpowered.revtools.util
 
-import org.objectweb.asm.tree.ClassNode
-import java.io.File
+import org.objectweb.asm.tree.LabelNode
 
-interface Decompiler {
-
-    fun decompileJar(sourceJar: File, outputZip: File)
-
-    fun decompileClassNode(cls: ClassNode): String
-
+class LabelMap : AbstractMap<LabelNode, LabelNode>() {
+    private val map = hashMapOf<LabelNode, LabelNode>()
+    override val entries get() = throw IllegalStateException()
+    override fun get(key: LabelNode) = map.getOrPut(key) { LabelNode() }
 }

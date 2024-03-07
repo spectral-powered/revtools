@@ -20,6 +20,9 @@ package org.spectralpowered.revtools.deobfuscator.bytecode
 
 import org.spectralpowered.revtools.ClassPool
 import org.spectralpowered.revtools.deobfuscator.Deobfuscator
+import org.spectralpowered.revtools.deobfuscator.bytecode.transformer.ControlFlowTransformer
+import org.spectralpowered.revtools.deobfuscator.bytecode.transformer.DeadCodeTransformer
+import org.spectralpowered.revtools.deobfuscator.bytecode.transformer.RenameTransformer
 import org.spectralpowered.revtools.deobfuscator.bytecode.transformer.RuntimeExceptionTransformer
 import org.tinylog.kotlin.Logger
 import java.io.File
@@ -30,7 +33,7 @@ class BytecodeDeobfuscator(
     private val outputJar: File
 ) : Deobfuscator {
 
-    private val pool = ClassPool()
+    val pool = ClassPool()
     private val transformers = mutableListOf<BytecodeTransformer>()
 
     private fun registerTransformers() {
@@ -39,6 +42,9 @@ class BytecodeDeobfuscator(
         // Register Bytecode Transformers
         // NOTE: Order of execution
         register<RuntimeExceptionTransformer>()
+        register<DeadCodeTransformer>()
+        register<ControlFlowTransformer>()
+        register<RenameTransformer>()
 
         Logger.info("Registered ${transformers.size} bytecode transformers.")
     }

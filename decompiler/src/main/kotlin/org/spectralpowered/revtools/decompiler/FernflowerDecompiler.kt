@@ -19,8 +19,12 @@
 package org.spectralpowered.revtools.decompiler
 
 import org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler
+import org.objectweb.asm.tree.ClassNode
+import org.spectralpowered.revtools.toBytes
 import org.tinylog.kotlin.Logger
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.nio.file.Files
 
 object FernflowerDecompiler : Decompiler {
@@ -28,13 +32,13 @@ object FernflowerDecompiler : Decompiler {
     var args = arrayOf(
         "-dgs=1",
         "-asc=1",
-        "-hdc=0"
     )
 
     override fun decompileJar(sourceJar: File, outputZip: File) {
         Logger.info("Decompiling jar file: ${sourceJar.name}...")
 
         val tempDir = Files.createTempDirectory("revtoolstmp").toFile()
+        tempDir.deleteOnExit()
         tempDir.mkdirs()
 
         val decompDir = tempDir.resolve("decomp/")
@@ -46,10 +50,59 @@ object FernflowerDecompiler : Decompiler {
         catch (ignored: Exception) { }
 
         if(outputZip.exists()) outputZip.deleteRecursively()
-
         val decompJar = decompDir.listFiles()!!.first()
         decompJar.renameTo(outputZip)
 
         Logger.info("Successfully decompiled jar classes to zip file: ${outputZip.name}.")
+    }
+
+    override fun decompileClassNode(cls: ClassNode): String {
+        Logger.info("Decompiling class: ${cls.name}.")
+
+        val tempDir = Files.createTempDirectory("revtoolstmp").toFile()
+        tempDir.deleteOnExit()
+        tempDir.mkdirs()
+
+        val decompDir = tempDir.resolve("decomp/")
+        decompDir.mkdirs()
+
+        val tempClass = File.createTempFile(cls.name, ".class")
+        tempClass.deleteOnExit()
+
+        var ex = ""
+        try {
+            tempClass.outputStream().use { output ->
+                output.write(cls.toBytes())
+            }
+        } catch (e: Exception) {
+            val exWriter = StringWriter()
+            e.printStackTrace(PrintWriter(exWriter))
+            e.printStackTrace()
+            ex = exWriter.toString()
+        }
+
+        try {
+            ConsoleDecompiler.main(arrayOf(*args, tempClass.absolutePath, decompDir.absolutePath))
+        } catch (e: Throwable) {
+            val exwriter = StringWriter()
+            e.printStackTrace(PrintWriter(exwriter))
+            e.printStackTrace()
+            ex = exwriter.toString()
+        }
+
+        val decompClass = decompDir.resolve("${cls.name}.java")
+        if(!decompClass.exists()) {
+            ex = "Failed to decompile class: ${cls.name}. ${decompClass.absolutePath} was not found."
+        }
+
+        val result = decompClass.bufferedReader().readText()
+        tempClass.deleteRecursively()
+        decompClass.deleteRecursively()
+
+        if(ex.isNotBlank()) {
+            error(ex)
+        }
+
+        return result
     }
 }

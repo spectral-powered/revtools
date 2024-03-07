@@ -62,6 +62,11 @@ val ClassNode.subClasses: MutableList<ClassNode> by mutableListField()
 val ClassNode.parentClasses get() = listOfNotNull(superClass).plus(interfaceClasses)
 val ClassNode.childClasses get() = subClasses.plus(implementerClasses)
 
+val ClassNode.allChildClasses: Set<ClassNode> get() = childClasses.flatMap { it.allChildClasses.plus(it) }.toSet()
+val ClassNode.allParentClasses: Set<ClassNode> get() = parentClasses.flatMap { it.allParentClasses.plus(it) }.toSet()
+
+val ClassNode.hierarchyClasses: Set<ClassNode> get() = allChildClasses.flatMap { it.allParentClasses.plus(it).distinct() }.toSet()
+
 val ClassNode.key get() = name
 
 fun ClassNode.isPublic() = access.isPublic()
@@ -100,35 +105,43 @@ fun ClassNode.findField(name: String, desc: String): FieldNode? {
 /**
  * Extension function to get all virtual methods for a given method.
  */
-fun ClassNode.getVirtualMethods(method: MethodNode): List<MethodNode> {
-    if (method.isStatic()) {
-        return listOf(method)
+fun ClassNode.findInheritedMethods(name: String, desc: String): List<MethodNode> {
+    fun findParentMethods(cls: ClassNode?, name: String, desc: String, methods: MutableList<MethodNode>): MutableList<MethodNode> {
+        if(cls == null) return methods
+        val method = cls.getMethod(name, desc)
+        if(method != null && !method.isStatic()) {
+            methods.add(method)
+        }
+        val baseMethods = findParentMethods(cls.superClass, name, desc, mutableListOf())
+        for(itf in cls.interfaceClasses) {
+            baseMethods.addAll(findParentMethods(itf, name, desc, mutableListOf()))
+        }
+        return if(baseMethods.isEmpty()) methods else baseMethods
     }
 
-    val virtualMethods = mutableListOf<MethodNode>()
-    val visited = mutableSetOf<ClassNode>()
-    val toVisit = ArrayDeque<ClassNode>()
-
-    method.cls.let { toVisit.add(it) }
-
-    while (toVisit.isNotEmpty()) {
-        val currentClassFile = toVisit.removeFirstOrNull() ?: continue
-        if (visited.contains(currentClassFile)) {
-            continue
+    fun findChildMethods(cls: ClassNode?, name: String, desc: String, methods: MutableList<MethodNode>, visited: HashSet<ClassNode>) {
+        if(cls == null || visited.contains(cls)) return
+        visited.add(cls)
+        val method = cls.getMethod(name, desc)
+        if(method != null && !method.isStatic()) {
+            methods.add(method)
         }
-        visited.add(currentClassFile)
-        currentClassFile.findMethod(method.name, method.desc)?.let { foundMethod ->
-            if (!foundMethod.isStatic()) {
-                virtualMethods.add(foundMethod)
-            }
+        for(child in cls.childClasses) {
+            findChildMethods(child, name, desc, methods, visited)
         }
-        currentClassFile.superClass?.takeIf { !visited.contains(it) }?.also { toVisit.add(it) }
-        currentClassFile.interfaceClasses
-            .filterNot { visited.contains(it) }
-            .forEach { toVisit.add(it) }
     }
 
-    return virtualMethods.distinct()
+    val method = findMethod(name, desc) ?: return emptyList()
+    val results = mutableListOf<MethodNode>()
+    if(method.isStatic()) {
+        results.add(method)
+        return results
+    }
+    val parents = findParentMethods(method.cls, method.name, method.desc, mutableListOf())
+    for(parent in parents) {
+        findChildMethods(parent.cls, parent.name, parent.desc, results, hashSetOf())
+    }
+    return results
 }
 
 /**

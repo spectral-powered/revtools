@@ -25,13 +25,20 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import org.jboss.windup.util.ZipUtil
+import org.spectralpowered.revtools.ClassPool
 import org.spectralpowered.revtools.decompiler.FernflowerDecompiler
 import org.spectralpowered.revtools.deobfuscator.ast.ASTDeobfuscator
 import org.spectralpowered.revtools.deobfuscator.bytecode.BytecodeDeobfuscator
+import org.spectralpowered.revtools.deobfuscator.compiler.JavaCompiler
 import org.tinylog.kotlin.Logger
 import java.io.File
 import java.nio.file.Files
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 class DeobfuscateCommand : CliktCommand(
     name = "deobfuscate",
@@ -59,15 +66,21 @@ class DeobfuscateCommand : CliktCommand(
     override fun run() {
         Logger.info("RevTools Deobfuscator (Spectral-Powered)")
 
+        var pool: ClassPool
         if(!noBytecodeDeob) {
             // Run the bytecode deobfuscator.
-            BytecodeDeobfuscator(inputJar, outputJar).run()
+            val bcdeob = BytecodeDeobfuscator(inputJar, outputJar)
+            bcdeob.run()
+            pool = bcdeob.pool
         } else {
             Files.deleteIfExists(outputJar.toPath())
             if(outputJar.parentFile?.exists() != true) {
                 outputJar.mkdirs()
             }
             inputJar.copyTo(outputJar)
+            pool = ClassPool()
+            pool.readJar(outputJar)
+            pool.init()
         }
 
         if(!noAstDeob) {
@@ -102,6 +115,11 @@ class DeobfuscateCommand : CliktCommand(
 
             // Run the AST deobfuscator
             ASTDeobfuscator(decompDir).run()
+
+            // Recompile the decomp dir to a jar.
+            JavaCompiler().also {
+
+            }
         }
 
         // Run the test client if enabled

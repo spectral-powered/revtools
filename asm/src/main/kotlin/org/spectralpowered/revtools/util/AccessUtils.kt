@@ -25,3 +25,4 @@ internal fun Int.isAbstract() = (this and ACC_ABSTRACT) != 0
 internal fun Int.isInterface() = (this and ACC_INTERFACE) != 0
 internal fun Int.isPublic() = (this and ACC_PUBLIC) != 0
 internal fun Int.isStatic() = (this and ACC_STATIC) != 0
+internal fun Int.isFinal() = (this and ACC_FINAL) != 0
