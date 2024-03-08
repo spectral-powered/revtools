@@ -19,8 +19,8 @@
 package org.spectralpowered.revtools.asm
 
 import io.kotest.core.spec.style.FunSpec
-import org.spectralpowered.revtools.exprs
-import org.spectralpowered.revtools.findMethod
+import org.spectralpowered.revtools.node.exprs
+import org.spectralpowered.revtools.node.findMethod
 
 class ExprTreeTests : FunSpec({
 

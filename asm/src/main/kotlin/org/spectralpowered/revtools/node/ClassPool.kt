@@ -16,10 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools
+package org.spectralpowered.revtools.node
 
+import DisjointSet
+import ForestDisjointSet
+import org.objectweb.asm.Opcodes.ACC_STATIC
 import org.objectweb.asm.commons.Remapper
 import org.objectweb.asm.tree.ClassNode
+import org.spectralpowered.revtools.MemberDesc
+import org.spectralpowered.revtools.MemberRef
 import org.spectralpowered.revtools.remap.NameMap
 import org.spectralpowered.revtools.remap.remap
 import java.io.File
@@ -149,4 +154,73 @@ class ClassPool {
     }
 
     fun remap(nameMap: NameMap) = remap(nameMap.toRemapper())
+
+    val inheritedMethodSets: DisjointSet<MemberRef> get() = createInheritedMemberSets(
+        { cls: ClassNode -> cls.methods.map { MemberDesc(it) } },
+        { cls: ClassNode, member: MemberDesc -> cls.findMethod(member.name, member.desc)?.access },
+        { member: MemberDesc, access: Int -> (access and ACC_STATIC) != 0 || member.name == "<init>" }
+    )
+
+    val inheritedFieldSets: DisjointSet<MemberRef> get() = createInheritedMemberSets(
+        { cls: ClassNode -> cls.fields.map { MemberDesc(it) } },
+        { cls: ClassNode, member: MemberDesc -> cls.findField(member.name, member.desc)?.access },
+        { _: MemberDesc, _: Int -> true }
+    )
+
+    private fun createInheritedMemberSets(
+        getMembers: (ClassNode) -> List<MemberDesc>,
+        getMemberAccess: (ClassNode, MemberDesc) -> Int?,
+        memberFilter: (MemberDesc, Int) -> Boolean
+    ): DisjointSet<MemberRef> {
+        val disjointSet = ForestDisjointSet<MemberRef>()
+        val inheritedMemberMap = mutableMapOf<ClassNode, Set<MemberDesc>>()
+
+        for(cls in allClasses) {
+            addInheritedMembers(
+                cls,
+                getMembers,
+                getMemberAccess,
+                memberFilter,
+                inheritedMemberMap,
+                disjointSet
+            )
+        }
+
+        return disjointSet
+    }
+
+    private fun addInheritedMembers(
+        cls: ClassNode,
+        getMembers: (ClassNode) -> List<MemberDesc>,
+        getMemberAccess: (ClassNode, MemberDesc) -> Int?,
+        memberFilter: (MemberDesc, Int) -> Boolean,
+        inheritedMembersMap: MutableMap<ClassNode, Set<MemberDesc>>,
+        disjointSet: DisjointSet<MemberRef>
+    ): Set<MemberDesc> {
+        inheritedMembersMap[cls]?.apply { return this }
+        val inheritedMembers = mutableSetOf<MemberDesc>()
+
+        for(parentCls in cls.parentClasses) {
+            val members = addInheritedMembers(parentCls, getMembers, getMemberAccess, memberFilter, inheritedMembersMap, disjointSet)
+            for(member in members) {
+                val access = getMemberAccess(cls, member)
+                if(access != null && memberFilter(member, access)) {
+                    continue
+                }
+
+                val treeA = disjointSet.add(MemberRef(cls.name, member))
+                val treeB = disjointSet.add(MemberRef(parentCls.name, member))
+                disjointSet.union(treeA, treeB)
+                inheritedMembers.add(member)
+            }
+        }
+
+        for(member in getMembers(cls)) {
+            disjointSet.add(MemberRef(cls.name, member))
+            inheritedMembers.add(member)
+        }
+
+        inheritedMembersMap[cls] = inheritedMembers
+        return inheritedMembers
+    }
 }

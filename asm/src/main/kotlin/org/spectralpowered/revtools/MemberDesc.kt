@@ -18,18 +18,18 @@
 
 package org.spectralpowered.revtools
 
-import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.FieldNode
-import org.spectralpowered.revtools.util.field
-import org.spectralpowered.revtools.util.isFinal
-import org.spectralpowered.revtools.util.isPrivate
-import org.spectralpowered.revtools.util.isStatic
+import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.MethodNode
 
-var FieldNode.cls: ClassNode by field()
-val FieldNode.pool get() = cls.pool
+data class MemberDesc(val name: String, val desc: String) {
+    constructor(method: MethodNode) : this(method.name, method.desc)
+    constructor(field: FieldNode) : this(field.name, field.desc)
+    constructor(methodInsn: MethodInsnNode) : this(methodInsn.name, methodInsn.desc)
+    constructor(fieldInsn: FieldInsnNode) : this(fieldInsn.name, fieldInsn.desc)
 
-val FieldNode.key get() = "${cls.key}.$name"
-
-fun FieldNode.isPrivate() = access.isPrivate()
-fun FieldNode.isStatic() = access.isStatic()
-fun FieldNode.isFinal() = access.isFinal()
+    override fun toString(): String {
+        return "$name $desc"
+    }
+}

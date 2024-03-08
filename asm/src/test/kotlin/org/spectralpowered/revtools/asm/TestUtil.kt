@@ -19,8 +19,8 @@
 package org.spectralpowered.revtools.asm
 
 import org.objectweb.asm.tree.ClassNode
-import org.spectralpowered.revtools.ClassPool
-import org.spectralpowered.revtools.fromBytes
+import org.spectralpowered.revtools.node.ClassPool
+import org.spectralpowered.revtools.node.fromBytes
 
 fun classPoolOf(vararg classes: String): ClassPool {
     val pool = ClassPool()

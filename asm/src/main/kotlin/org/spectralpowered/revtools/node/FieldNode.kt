@@ -16,10 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.deobfuscator
+package org.spectralpowered.revtools.node
 
-interface Deobfuscator {
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldNode
+import org.spectralpowered.revtools.util.field
+import org.spectralpowered.revtools.util.isFinal
+import org.spectralpowered.revtools.util.isPrivate
+import org.spectralpowered.revtools.util.isStatic
 
-    fun run()
+var FieldNode.cls: ClassNode by field()
+val FieldNode.pool get() = cls.pool
 
-}
+val FieldNode.key get() = "${cls.key}.$name"
+
+fun FieldNode.isPrivate() = access.isPrivate()
+fun FieldNode.isStatic() = access.isStatic()
+fun FieldNode.isFinal() = access.isFinal()

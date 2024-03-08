@@ -24,7 +24,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
-import org.spectralpowered.revtools.*
+import org.spectralpowered.revtools.node.*
 
 class ClassNodeTest : StringSpec({
 

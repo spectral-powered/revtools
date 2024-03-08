@@ -19,4 +19,10 @@ enableFeaturePreview(TYPESAFE_PROJECT_ACCESSORS.name)
 
 rootProject.name = "revtools"
 
-include("logger", "asm", "deobfuscator", "downloader", "decompiler")
+include("asm")
+include("decompiler")
+include("deobfuscator", "deobfuscator:bytecode", "deobfuscator:ast")
+include("downloader")
+include("logger")
+include("updater")
+include("client")

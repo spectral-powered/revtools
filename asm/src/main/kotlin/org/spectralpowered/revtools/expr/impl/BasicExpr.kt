@@ -20,7 +20,7 @@ package org.spectralpowered.revtools.expr.impl
 
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.spectralpowered.revtools.expr.ExprTree
-import org.spectralpowered.revtools.toOpcodeString
+import org.spectralpowered.revtools.node.toOpcodeString
 
 open class BasicExpr(var insn: AbstractInsnNode, internal var index: Int, internal var size: Int) : Iterable<BasicExpr> {
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools
+package org.spectralpowered.revtools.node
 
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter

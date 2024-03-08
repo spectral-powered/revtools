@@ -23,7 +23,9 @@ import org.objectweb.asm.commons.SimpleRemapper
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
-import org.spectralpowered.revtools.*
+import org.spectralpowered.revtools.node.allChildClasses
+import org.spectralpowered.revtools.node.cls
+import org.spectralpowered.revtools.node.key
 
 class NameMap : Remapper() {
 

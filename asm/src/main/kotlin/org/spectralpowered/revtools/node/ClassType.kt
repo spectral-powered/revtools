@@ -16,15 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.deobfuscator.bytecode
+package org.spectralpowered.revtools.node
 
-import org.spectralpowered.revtools.ClassPool
-
-interface BytecodeTransformer {
-
-    fun run(pool: ClassPool)
-
-    fun postRun() {
-
-    }
+enum class ClassType {
+    RESOLVED,
+    IGNORED,
+    RUNTIME,
 }

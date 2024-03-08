@@ -16,15 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.decompiler
+package org.spectralpowered.revtools.asm
 
-import org.objectweb.asm.tree.ClassNode
+import io.kotest.core.spec.style.FunSpec
+import org.spectralpowered.revtools.node.ClassPool
 import java.io.File
 
-interface Decompiler {
+class ClassPoolTests : FunSpec({
 
-    fun decompileJar(sourceJar: File, outputZip: File)
+    test("inheritedMethodSets should not be empty") {
+        val pool = ClassPool()
+        pool.readJar(File("C:\\Users\\kgsta\\Development\\Projects\\Organizations\\Spectral Powered\\revtools\\build\\revtools\\gamepack.deob.jar"))
+        pool.init()
 
-    fun decompileClassNode(cls: ClassNode): String
-
-}
+        val methodTres = pool.inheritedMethodSets
+        println(methodTres.size)
+    }
+})
