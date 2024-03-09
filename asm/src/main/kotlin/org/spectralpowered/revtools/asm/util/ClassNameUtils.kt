@@ -16,13 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.util
+package org.spectralpowered.revtools.asm.util
 
-import org.objectweb.asm.Opcodes.*
-
-internal fun Int.isPrivate() = (this and ACC_PRIVATE) != 0
-internal fun Int.isAbstract() = (this and ACC_ABSTRACT) != 0
-internal fun Int.isInterface() = (this and ACC_INTERFACE) != 0
-internal fun Int.isPublic() = (this and ACC_PUBLIC) != 0
-internal fun Int.isStatic() = (this and ACC_STATIC) != 0
-internal fun Int.isFinal() = (this and ACC_FINAL) != 0
+fun String.toClassName() = replace("/", ".")
+fun String.toAsmName() = replace(".", "/")

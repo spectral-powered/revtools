@@ -16,12 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.util
+package org.spectralpowered.revtools.asm.node
 
-import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodNode
+import org.spectralpowered.revtools.asm.MemberDesc
+import org.spectralpowered.revtools.asm.MemberRef
+import org.spectralpowered.revtools.asm.util.field
 
-class LabelMap : AbstractMap<LabelNode, LabelNode>() {
-    private val map = hashMapOf<LabelNode, LabelNode>()
-    override val entries get() = throw IllegalStateException()
-    override fun get(key: LabelNode) = map.getOrPut(key) { LabelNode() }
+fun MethodNode.init(cls: ClassNode) {
+    this.cls = cls
 }
+
+var MethodNode.cls: ClassNode by field()
+
+val MethodNode.memberDesc get() = MemberDesc(name, desc)
+val MethodNode.memberRef get() = MemberRef(cls, this)

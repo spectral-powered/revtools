@@ -16,15 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.util
+package org.spectralpowered.revtools.asm.util
 
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
 class ExtensionField<R, T>(
-    private val init: (R) -> T = { throw IllegalStateException("Property not initialized!") },
-    private val setterCallback: (R.(T) -> Unit)? = null
+        private val init: (R) -> T = { throw IllegalStateException("Property not initialized!") },
+        private val setterCallback: (R.(T) -> Unit)? = null
 ) {
     private val store = mutableWeakIdentityHashMap<R, T>()
 
@@ -37,8 +37,8 @@ class ExtensionField<R, T>(
 }
 
 class NullableExtensionField<R, T>(
-    private val init: (R) -> T? = { null },
-    private val setterCallback: (R.(T?) -> Unit)? = null
+        private val init: (R) -> T? = { null },
+        private val setterCallback: (R.(T?) -> Unit)? = null
 ) {
     private val store = mutableWeakIdentityHashMap<R, T?>()
 

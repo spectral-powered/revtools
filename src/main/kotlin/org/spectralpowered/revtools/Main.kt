@@ -20,13 +20,11 @@ package org.spectralpowered.revtools
 
 import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
-import org.spectralpowered.revtools.deobfuscator.DeobfuscateCommand
 import org.spectralpowered.revtools.downloader.DownloadCommand
 
 fun main(args: Array<String>) = MainCommand()
     .subcommands(
         DownloadCommand(),
-        DeobfuscateCommand()
     )
     .main(args)
 

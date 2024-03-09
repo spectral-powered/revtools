@@ -19,17 +19,33 @@
 package org.spectralpowered.revtools.asm
 
 import io.kotest.core.spec.style.FunSpec
-import org.spectralpowered.revtools.node.ClassPool
+import org.spectralpowered.revtools.asm.node.getMethod
+import org.spectralpowered.revtools.asm.node.memberRef
 import java.io.File
 
 class ClassPoolTests : FunSpec({
 
-    test("inheritedMethodSets should not be empty") {
+    xtest("Loading Jar file") {
         val pool = ClassPool()
-        pool.readJar(File("C:\\Users\\kgsta\\Development\\Projects\\Organizations\\Spectral Powered\\revtools\\build\\revtools\\gamepack.deob.jar"))
-        pool.init()
+        pool.loadJar(File("../build/revtools/gamepack.jar"))
+        pool.build()
 
-        val methodTres = pool.inheritedMethodSets
-        println(methodTres.size)
+        pool.writeJar(File("../build/revtools/gamepack.out.jar"))
+
+        println()
+    }
+
+    test("Check inherited method sets") {
+        val pool = ClassPool()
+        pool.loadJar(File("../build/revtools/gamepack.jar"))
+        pool.build()
+
+        val cls = pool.findClass("client")!!
+        val method = cls.getMethod("init", "()V")!!
+
+        val inheritedMethods = pool.createInheritedMethodSets()
+        val inheritedMethod = inheritedMethods[method.memberRef]!!
+
+        println(inheritedMethod)
     }
 })

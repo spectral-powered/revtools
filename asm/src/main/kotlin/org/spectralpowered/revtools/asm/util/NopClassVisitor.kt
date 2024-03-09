@@ -16,24 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.expr
+package org.spectralpowered.revtools.asm.util
 
-import org.spectralpowered.revtools.expr.impl.BasicExpr
-import org.spectralpowered.revtools.expr.impl.ConstExpr
-import org.spectralpowered.revtools.expr.impl.LdcExpr
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.Opcodes.ASM9
 
-interface ExprTreeVisitor {
-
-    fun visitExpr(expr: BasicExpr) = when(expr) {
-        is ConstExpr -> visitConstExpr(expr)
-        is LdcExpr -> visitLdcExpr(expr)
-        else -> visitBasicExpr(expr)
-    }
-
-    fun visitBasicExpr(expr: BasicExpr) {}
-    fun visitConstExpr(expr: ConstExpr) {}
-    fun visitLdcExpr(expr: LdcExpr) {}
-
-    fun visitStart(tree: ExprTree) {}
-    fun visitEnd(tree: ExprTree) {}
-}
+object NopClassVisitor : ClassVisitor(ASM9)

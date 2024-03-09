@@ -16,18 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm
+package org.spectralpowered.revtools.asm.util
 
-import io.kotest.core.spec.style.FunSpec
-import org.spectralpowered.revtools.node.exprs
-import org.spectralpowered.revtools.node.findMethod
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.commons.JSRInlinerAdapter
 
-class ExprTreeTests : FunSpec({
-
-    test("BasicExpr test") {
-        val pool = classPoolOf("TestSrc1")
-        val method = pool.findClass("TestSrc1")!!.findMethod("expr1", "()V")!!
-        val exprTree = method.exprs
-        //println(exprTree)
+class JsrInliner(cv: ClassVisitor) : ClassVisitor(ASM9, cv) {
+    override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor {
+        val mv = super.visitMethod(access, name, descriptor, signature, exceptions)
+        return JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions)
     }
-})
+}

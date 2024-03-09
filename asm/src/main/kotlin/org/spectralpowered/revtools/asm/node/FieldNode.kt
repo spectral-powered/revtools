@@ -16,5 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools
+package org.spectralpowered.revtools.asm.node
 
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldNode
+import org.spectralpowered.revtools.asm.MemberDesc
+import org.spectralpowered.revtools.asm.MemberRef
+import org.spectralpowered.revtools.asm.util.field
+
+fun FieldNode.init(cls: ClassNode) {
+    this.cls = cls
+}
+
+var FieldNode.cls: ClassNode by field()
+
+val FieldNode.memberDesc get() = MemberDesc(name, desc)
+val FieldNode.memberRef get() = MemberRef(cls, this)

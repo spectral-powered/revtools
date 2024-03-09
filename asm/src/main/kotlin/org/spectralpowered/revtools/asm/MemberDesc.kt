@@ -16,10 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.node
+package org.spectralpowered.revtools.asm
 
-enum class ClassType {
-    RESOLVED,
-    IGNORED,
-    RUNTIME,
+import org.objectweb.asm.tree.FieldNode
+import org.objectweb.asm.tree.MethodNode
+
+data class MemberDesc(val name: String, val desc: String) {
+    constructor(method: MethodNode) : this(method.name, method.desc)
+    constructor(field: FieldNode) : this(field.name, field.desc)
+
+    override fun toString(): String {
+        return "$name $desc"
+    }
 }

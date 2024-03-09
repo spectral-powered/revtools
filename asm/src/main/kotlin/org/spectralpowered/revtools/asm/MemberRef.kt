@@ -16,32 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools
+package org.spectralpowered.revtools.asm
 
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.FieldNode
-import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-data class MemberRef(val owner: String, val name: String, val desc: String) : Comparable<MemberRef> {
+data class MemberRef(val owner: String, val name: String, val desc: String) {
+    constructor(cls: ClassNode, name: String, desc: String) : this(cls.name, name, desc)
     constructor(cls: ClassNode, method: MethodNode) : this(cls.name, method.name, method.desc)
     constructor(cls: ClassNode, field: FieldNode) : this(cls.name, field.name, field.desc)
-    constructor(methodInsn: MethodInsnNode) : this(methodInsn.owner, methodInsn.name, methodInsn.desc)
-    constructor(fieldInsn: FieldInsnNode) : this(fieldInsn.owner, fieldInsn.name, fieldInsn.desc)
     constructor(owner: String, memberDesc: MemberDesc) : this(owner, memberDesc.name, memberDesc.desc)
 
-    override fun compareTo(other: MemberRef): Int {
-        var result = owner.compareTo(other.owner)
-        if(result != 0) return result
-
-        result = name.compareTo(other.name)
-        if(result != 0) return result
-
-        return desc.compareTo(other.desc)
-    }
-
     override fun toString(): String {
-        return "$owner.$name $desc"
+        return "$owner $name $desc"
     }
 }

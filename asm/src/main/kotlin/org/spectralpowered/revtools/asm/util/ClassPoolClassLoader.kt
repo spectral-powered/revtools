@@ -16,15 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.expr.impl
+package org.spectralpowered.revtools.asm.util
 
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.LdcInsnNode
+import org.spectralpowered.revtools.asm.ClassPool
+import java.net.URLClassLoader
 
-class LdcExpr(insn: AbstractInsnNode, index: Int, size: Int) : E0Expr(insn, index, size) {
+class ClassPoolClassLoader(private val pool: ClassPool) : URLClassLoader(arrayOf(), ClassLoader.getPlatformClassLoader()) {
 
-    override val instruction get() = insn as LdcInsnNode
-
-    val cst get() = instruction.cst
 
 }

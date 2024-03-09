@@ -16,18 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface DisjointSet<T> : Iterable<DisjointSet.Partition<T>> {
-    public interface Partition<T> : Iterable<T>
+package org.spectralpowered.revtools.asm.util
 
-    public val elements: Int
-    public val partitions: Int
+interface DisjointSet<T> : Iterable<DisjointSet.Partition<T>> {
+    interface Partition<T> : Iterable<T>
 
-    public fun add(x: T): Partition<T>
-    public operator fun get(x: T): Partition<T>?
-    public fun union(x: Partition<T>, y: Partition<T>)
+    val elements: Int
+    val partitions: Int
+
+    fun add(x: T): Partition<T>
+    operator fun get(x: T): Partition<T>?
+    fun union(x: Partition<T>, y: Partition<T>)
 }
 
-public class ForestDisjointSet<T> : DisjointSet<T> {
+class ForestDisjointSet<T> : DisjointSet<T> {
     private class Node<T>(val value: T) : DisjointSet.Partition<T> {
         val children = mutableListOf<Node<T>>()
         private var _parent = this

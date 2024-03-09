@@ -16,19 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm
+package org.spectralpowered.revtools.asm.util
 
-import org.objectweb.asm.tree.ClassNode
-import org.spectralpowered.revtools.node.ClassPool
-import org.spectralpowered.revtools.node.fromBytes
+import org.objectweb.asm.ClassWriter
+import org.spectralpowered.revtools.asm.ClassPool
 
-fun classPoolOf(vararg classes: String): ClassPool {
-    val pool = ClassPool()
-    for(className in classes) {
-        val bytes = ExprTreeTests::class.java.getResourceAsStream("/$className.class")!!.readBytes()
-        val cls = ClassNode().fromBytes(bytes)
-        pool.addClass(cls)
+class AsmClassWriter(private val pool: ClassPool) : ClassWriter(COMPUTE_FRAMES) {
+    override fun getCommonSuperClass(cls1: String, cls2: String): String {
+        try {
+            return super.getCommonSuperClass(cls1, cls2)
+        } catch (e: Exception) {
+            if(pool.containsClass(cls1) && pool.containsClass(cls2)) {
+                val super1 = pool.findClass(cls1)!!.superName
+                val super2 = pool.findClass(cls2)!!.superName
+                if(super1 == super2) return super1
+            }
+            return "java/lang/Object"
+        }
     }
-    pool.init()
-    return pool
 }
