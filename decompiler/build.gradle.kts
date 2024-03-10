@@ -2,14 +2,18 @@ plugins {
     application
 }
 
+repositories {
+    maven(url = "https://repo.openrs2.org/repository/openrs2")
+}
+
 dependencies {
-    implementation(projects.asm)
     implementation(projects.logger)
     implementation("com.github.ajalt:clikt:_")
+    implementation("org.openrs2:fernflower:_")
 }
 
 application {
-    mainClass.set("org.spectralpowered.revtools.deobfuscator.bytecode.Deobfuscator")
+    mainClass.set("org.spectralpowered.revtools.decompiler.DecompilerKt")
 }
 
 tasks {
@@ -18,11 +22,11 @@ tasks {
         workingDir = rootProject.projectDir
     }
 
-    register("deobfuscate-bytecode") {
+    register("decompile-gamepack") {
         group = "revtools"
         doFirst {
             run.configure {
-                args = listOf("build/revtools/gamepack.jar", "build/revtools/gamepack.deob.jar")
+                args = listOf("build/revtools/gamepack.deob.jar", "build/revtools/decomp/")
             }
         }
         finalizedBy(run)

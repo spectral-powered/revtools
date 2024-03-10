@@ -103,13 +103,13 @@ class ClassPool {
         }
     }
 
-    fun writeJar(file: File) {
+    fun writeJar(file: File, includeIgnored: Boolean = false) {
         Files.deleteIfExists(file.toPath())
         if(file.parentFile?.exists() != true) file.parentFile?.mkdirs()
         file.createNewFile()
         JarOutputStream(file.outputStream()).use { jos ->
             for(cls in allClasses) {
-                if(cls.isRuntime || cls.isIgnored) continue
+                if(cls.isRuntime || (cls.isIgnored && !includeIgnored)) continue
                 jos.putNextEntry(JarEntry("${cls.name}.class"))
                 jos.write(cls.toBytes())
                 jos.closeEntry()

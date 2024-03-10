@@ -70,13 +70,4 @@ tasks {
         finalizedBy(run)
     }
 
-    register("deobfuscate") {
-        group = "revtools"
-        doFirst {
-            run.configure {
-                args = listOf("deobfuscate", "build/revtools/gamepack.jar", "build/revtools/gamepack.deob.jar", "-tc")
-            }
-        }
-        finalizedBy(run)
-    }
 }
