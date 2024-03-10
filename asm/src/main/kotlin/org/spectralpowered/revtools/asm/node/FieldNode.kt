@@ -18,6 +18,7 @@
 
 package org.spectralpowered.revtools.asm.node
 
+import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.spectralpowered.revtools.asm.MemberDesc
@@ -29,6 +30,11 @@ fun FieldNode.init(cls: ClassNode) {
 }
 
 var FieldNode.cls: ClassNode by field()
+val FieldNode.pool get() = cls.pool
 
 val FieldNode.memberDesc get() = MemberDesc(name, desc)
 val FieldNode.memberRef get() = MemberRef(cls, this)
+
+fun FieldNode.isPublic() = (access and ACC_PUBLIC) != 0
+fun FieldNode.isPrivate() = (access and ACC_PRIVATE) != 0
+fun FieldNode.isStatic() = (access and ACC_STATIC) != 0

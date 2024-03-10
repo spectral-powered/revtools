@@ -20,8 +20,11 @@ package org.spectralpowered.revtools.deobfuscator.bytecode
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import org.spectralpowered.revtools.asm.ClassPool
+import org.spectralpowered.revtools.deobfuscator.bytecode.transformer.*
 import org.tinylog.kotlin.Logger
 import java.io.File
 
@@ -38,6 +41,14 @@ class Deobfuscator(
          * Register bytecode transformers.
          * NOTE! The order here matters
          */
+        register<RuntimeExceptionTransformer>()
+        register<DeadCodeTransformer>()
+        register<OpaquePredicateTransformer>()
+        register<DeadCodeTransformer>()
+        register<ControlFlowTransformer>()
+        register<RenameTransformer>()
+        register<FinalClassTransformer>()
+        register<InvokeSpecialTransformer>()
 
         Logger.info("Registered ${transformers.size} bytecode transformers.")
     }
@@ -99,11 +110,19 @@ class Deobfuscator(
         private val outputJar by argument("output-jar", help = "Output jar file path")
             .file(canBeDir = false)
 
+        private val runTestClient by option("--test-client", "-tc", help = "Runs a test client using output jar.")
+            .flag(default = false)
+
         override fun run() {
             Deobfuscator(
                 inputJar,
                 outputJar
             ).run()
+
+            if(runTestClient) {
+                Logger.info("Starting test client using jar: ${outputJar.path}.")
+                TestClient(outputJar).start()
+            }
         }
     }
 

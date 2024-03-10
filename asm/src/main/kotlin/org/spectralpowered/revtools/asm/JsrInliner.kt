@@ -16,12 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.asm
 
-import org.spectralpowered.revtools.asm.ClassPool
-import java.net.URLClassLoader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.commons.JSRInlinerAdapter
 
-class ClassPoolClassLoader(private val pool: ClassPool) : URLClassLoader(arrayOf(), ClassLoader.getSystemClassLoader()) {
-
-
+class JsrInliner(cv: ClassVisitor) : ClassVisitor(ASM9, cv) {
+    override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor {
+        val mv = super.visitMethod(access, name, descriptor, signature, exceptions)
+        return JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions)
+    }
 }

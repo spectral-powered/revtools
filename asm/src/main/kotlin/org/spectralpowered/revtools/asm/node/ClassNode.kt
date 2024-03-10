@@ -19,12 +19,10 @@
 package org.spectralpowered.revtools.asm.node
 
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes.ACC_INTERFACE
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.util.CheckClassAdapter
-import org.spectralpowered.revtools.asm.ClassPool
-import org.spectralpowered.revtools.asm.MemberDesc
+import org.spectralpowered.revtools.asm.*
 import org.spectralpowered.revtools.asm.util.*
 
 fun ClassNode.init(pool: ClassPool) {
@@ -35,7 +33,15 @@ fun ClassNode.init(pool: ClassPool) {
 
 fun ClassNode.build() {
     superClass = superName?.let { pool.findClass(it) }
+    superClass?.childClasses?.add(this)
     interfaceClasses = interfaces.mapNotNull { pool.findClass(it) }.toMutableSet()
+    interfaceClasses.forEach { itf -> itf.childClasses.add(this) }
+}
+
+fun ClassNode.reset() {
+    superClass = null
+    interfaceClasses.clear()
+    childClasses.clear()
 }
 
 var ClassNode.pool: ClassPool by field()
@@ -45,6 +51,8 @@ var ClassNode.jarIndex: Int by field { -1 }
 
 var ClassNode.superClass: ClassNode? by nullField()
 var ClassNode.interfaceClasses: MutableSet<ClassNode> by mutableSetField()
+var ClassNode.childClasses: MutableSet<ClassNode> by mutableSetField()
+val ClassNode.parentClasses get() = listOfNotNull(superClass).plus(interfaceClasses)
 
 val ClassNode.memberMethods get() = methods.map { it.memberDesc }.toList()
 val ClassNode.memberFields get() = fields.map { it.memberDesc }.toList()

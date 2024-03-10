@@ -16,9 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.asm.remap
 
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.commons.Remapper
+import org.objectweb.asm.tree.AbstractInsnNode
 
-object NopClassVisitor : ClassVisitor(ASM9)
+open class AsmRemapper : Remapper() {
+
+    open fun mapMethodOwner(owner: String, name: String, desc: String): String {
+        return mapType(owner)
+    }
+
+    open fun mapFieldOwner(owner: String, name: String, desc: String): String {
+        return mapType(owner)
+    }
+
+    open fun getFieldInitializer(owner: String, name: String, desc: String): List<AbstractInsnNode>? {
+        return null
+    }
+}

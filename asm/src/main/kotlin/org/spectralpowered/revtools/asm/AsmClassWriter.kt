@@ -16,12 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.asm
 
+import org.objectweb.asm.ClassWriter
 import org.spectralpowered.revtools.asm.ClassPool
-import java.net.URLClassLoader
 
-class ClassPoolClassLoader(private val pool: ClassPool) : URLClassLoader(arrayOf(), ClassLoader.getSystemClassLoader()) {
-
-
+class AsmClassWriter(private val pool: ClassPool) : ClassWriter(COMPUTE_FRAMES) {
+    override fun getCommonSuperClass(cls1: String, cls2: String): String {
+        try {
+            return super.getCommonSuperClass(cls1, cls2)
+        } catch (e: Exception) {
+            if(pool.containsClass(cls1) && pool.containsClass(cls2)) {
+                val super1 = pool.findClass(cls1)!!.superName
+                val super2 = pool.findClass(cls2)!!.superName
+                if(super1 == super2) return super1
+            }
+            return "java/lang/Object"
+        }
+    }
 }

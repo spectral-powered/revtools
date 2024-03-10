@@ -22,6 +22,8 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes.ACC_STATIC
 import org.objectweb.asm.tree.ClassNode
 import org.spectralpowered.revtools.asm.node.*
+import org.spectralpowered.revtools.asm.remap.AsmRemapper
+import org.spectralpowered.revtools.asm.remap.remap
 import org.spectralpowered.revtools.asm.util.DisjointSet
 import org.spectralpowered.revtools.asm.util.ForestDisjointSet
 import org.spectralpowered.revtools.asm.util.toClassName
@@ -95,7 +97,7 @@ class ClassPool {
         JarFile(file).use { jar ->
             for((index, entry) in jar.entries().asSequence().withIndex()) {
                 if(!entry.name.endsWith(".class")) continue
-                val bytes = jar.getInputStream(entry).readAllBytes()
+                val bytes = jar.getInputStream(entry).readBytes()
                 val cls = ClassNode().fromBytes(bytes, ClassReader.SKIP_FRAMES)
                 addClass(cls)
                 cls.jarIndex = index
@@ -118,10 +120,15 @@ class ClassPool {
     }
 
     fun build(postLogic: (ClassPool) -> Unit = {}) {
-        for(cls in classes) {
-            cls.build()
-        }
+        for(cls in classes) cls.reset()
+        for(cls in classes) cls.build()
         postLogic(this)
+    }
+
+    fun remap(remapper: AsmRemapper) {
+        for(cls in classes) {
+            cls.remap(remapper)
+        }
     }
 
     private inline fun computeIfAbsent(name: String, block: (String) -> ClassNode?): ClassNode? {

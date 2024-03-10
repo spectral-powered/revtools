@@ -31,7 +31,7 @@ abstract class Transformer {
     open fun transform(pool: ClassPool) {
         this.pool = pool
 
-        onEnter()
+        onStart()
         var changed: Boolean
         do {
            changed = preTransform()
@@ -46,10 +46,10 @@ abstract class Transformer {
            }
             changed = changed or postTransform()
         } while(changed)
-        onExit()
+        onComplete()
     }
 
-    open fun onEnter() {}
+    open fun onStart() {}
 
     open fun preTransform(): Boolean {
         return false
@@ -71,5 +71,5 @@ abstract class Transformer {
         return false
     }
 
-    open fun onExit() {}
+    open fun onComplete() {}
 }

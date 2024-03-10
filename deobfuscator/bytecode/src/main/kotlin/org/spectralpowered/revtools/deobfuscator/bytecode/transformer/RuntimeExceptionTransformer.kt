@@ -16,16 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes.ASM9
-import org.objectweb.asm.commons.JSRInlinerAdapter
+import org.objectweb.asm.Opcodes.ATHROW
+import org.objectweb.asm.tree.MethodNode
+import org.spectralpowered.revtools.asm.node.nextReal
+import org.spectralpowered.revtools.deobfuscator.bytecode.Transformer
+import org.tinylog.kotlin.Logger
 
-class JsrInliner(cv: ClassVisitor) : ClassVisitor(ASM9, cv) {
-    override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor {
-        val mv = super.visitMethod(access, name, descriptor, signature, exceptions)
-        return JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions)
+class RuntimeExceptionTransformer : Transformer() {
+
+    private var count = 0
+
+    override fun transformMethod(method: MethodNode): Boolean {
+        val foundTcb = method.tryCatchBlocks.removeIf { tcb ->
+            tcb.type == "java/lang/RuntimeException"
+        }
+
+        if(foundTcb) {
+            count++
+        }
+
+        return false
+    }
+
+    override fun onComplete() {
+        Logger.info("Removed $count RuntimeException try-catch blocks.")
     }
 }

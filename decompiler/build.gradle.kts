@@ -26,7 +26,11 @@ tasks {
         group = "revtools"
         doFirst {
             run.configure {
-                args = listOf("build/revtools/gamepack.deob.jar", "build/revtools/decomp/")
+                args = if(environment.containsKey("args")) {
+                    environment["args"]!!.toString().split(" ").toList()
+                } else {
+                    listOf("build/revtools/gamepack.deob.jar", "build/revtools/decomp/")
+                }
             }
         }
         finalizedBy(run)

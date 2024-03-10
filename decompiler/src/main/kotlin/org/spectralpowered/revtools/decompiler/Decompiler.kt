@@ -35,7 +35,7 @@ class Decompiler : CliktCommand(
 
     private val options = mapOf(
         IFernflowerPreferences.INDENT_STRING to "\t",
-        IFernflowerPreferences.SYNTHETIC_NOT_SET to "1",
+        IFernflowerPreferences.DECOMPILE_GENERIC_SIGNATURES to "1",
         IFernflowerPreferences.ASCII_STRING_CHARACTERS to "1"
     )
 

@@ -16,12 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.util
+package org.spectralpowered.revtools.asm
 
-import org.spectralpowered.revtools.asm.ClassPool
-import java.net.URLClassLoader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.Opcodes.ASM9
 
-class ClassPoolClassLoader(private val pool: ClassPool) : URLClassLoader(arrayOf(), ClassLoader.getSystemClassLoader()) {
-
-
-}
+object NopClassVisitor : ClassVisitor(ASM9)
