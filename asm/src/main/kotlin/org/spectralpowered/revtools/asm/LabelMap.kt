@@ -19,10 +19,13 @@
 package org.spectralpowered.revtools.asm
 
 import org.objectweb.asm.tree.LabelNode
-import java.util.IdentityHashMap
+import java.util.*
+import kotlin.collections.AbstractMap
+import kotlin.collections.getOrPut
 
 class LabelMap : AbstractMap<LabelNode, LabelNode>() {
     private val map = IdentityHashMap<LabelNode, LabelNode>()
     override val entries get() = throw IllegalStateException()
     override fun get(key: LabelNode) = map.getOrPut(key) { LabelNode() }
+    fun add(key: LabelNode) = map.computeIfAbsent(key) { key }
 }

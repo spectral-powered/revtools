@@ -18,7 +18,6 @@
 
 package org.spectralpowered.revtools.asm.node
 
-import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*

@@ -19,7 +19,7 @@
 package org.spectralpowered.revtools.downloader
 
 import org.jsoup.Jsoup
-import java.util.Properties
+import java.util.*
 
 class JavConfig(val url: String) {
 

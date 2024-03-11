@@ -23,7 +23,9 @@ import org.objectweb.asm.Opcodes.ACC_INTERFACE
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.util.CheckClassAdapter
 import org.spectralpowered.revtools.asm.*
-import org.spectralpowered.revtools.asm.util.*
+import org.spectralpowered.revtools.asm.util.field
+import org.spectralpowered.revtools.asm.util.mutableSetField
+import org.spectralpowered.revtools.asm.util.nullField
 
 fun ClassNode.init(pool: ClassPool) {
     this.pool = pool

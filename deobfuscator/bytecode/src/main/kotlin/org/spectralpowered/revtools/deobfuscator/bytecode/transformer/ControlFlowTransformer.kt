@@ -18,19 +18,12 @@
 
 package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 
-import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes.*
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.JumpInsnNode
-import org.objectweb.asm.tree.LabelNode
-import org.objectweb.asm.tree.LineNumberNode
-import org.objectweb.asm.tree.LookupSwitchInsnNode
-import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.TableSwitchInsnNode
+import org.objectweb.asm.tree.*
 import org.spectralpowered.revtools.asm.LabelMap
 import org.spectralpowered.revtools.deobfuscator.bytecode.Transformer
 import org.tinylog.kotlin.Logger
+import java.util.*
 
 class ControlFlowTransformer : Transformer() {
 
@@ -41,12 +34,21 @@ class ControlFlowTransformer : Transformer() {
         if(method.tryCatchBlocks.isEmpty()) {
             // Reorder Instructions
             val labelMap = LabelMap()
+            val tcbLabelMap = IdentityHashMap<LabelNode, LabelNode>()
             val newInsns = InsnList()
             val blocks = ControlFlowGraph(method).blocks()
+            method.instructions.filterIsInstance<LabelNode>().forEach { it ->
+                tcbLabelMap[it] = LabelNode()
+            }
             for(block in blocks) {
                 blockCount++
                 for(insn in block.instructions) {
-                    newInsns.add(insn.clone(labelMap))
+                    if(insn is LabelNode) {
+                        val label = tcbLabelMap[insn]
+                        newInsns.add(label)
+                    } else {
+                        newInsns.add(insn.clone(labelMap))
+                    }
                 }
                 if(block.next != null && block.instructions.isNotEmpty()) {
                     val lastInsn = block.instructions.last()
@@ -54,17 +56,14 @@ class ControlFlowTransformer : Transformer() {
                         val nextBlock = block.next!!
                         var firstInsn = nextBlock.instructions.first()
                         if(firstInsn !is LabelNode) {
-                            firstInsn = LabelNode(Label())
+                            firstInsn = LabelNode()
                             nextBlock.instructions.add(0, firstInsn)
                         }
-                        newInsns.add(JumpInsnNode(GOTO, firstInsn.clone(labelMap) as LabelNode))
+                        newInsns.add(JumpInsnNode(GOTO, firstInsn as LabelNode))
                     }
                 }
             }
-            method.instructions = newInsns
-        }
 
-        if(method.tryCatchBlocks.isEmpty()) {
             // Rebuild jumps
             val insns = method.instructions.toList()
             for(i in 0 until insns.size - 1) {
@@ -77,6 +76,7 @@ class ControlFlowTransformer : Transformer() {
                 jumpCount++
             }
         }
+
         return false
     }
 

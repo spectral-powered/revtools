@@ -18,7 +18,7 @@
 
 package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 
-import org.objectweb.asm.Opcodes.*
+import org.objectweb.asm.Opcodes.GOTO
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 import org.spectralpowered.revtools.asm.InsnMatcher
@@ -34,9 +34,11 @@ class OpaquePredicateTransformer : Transformer() {
     override fun transformMethod(method: MethodNode): Boolean {
         for(insns in EXCEPTION_PATTERN.match(method).filter { checkExceptionPattern(method, it) }) {
             method.removeMatchedInsns(insns)
+            break
         }
         for(insns in RETURN_PATTERN.match(method).filter { checkReturnPattern(method, it) }) {
             method.removeMatchedInsns(insns)
+            break
         }
         return false
     }

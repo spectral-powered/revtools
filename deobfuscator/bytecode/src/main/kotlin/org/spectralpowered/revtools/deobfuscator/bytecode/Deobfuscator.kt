@@ -44,9 +44,9 @@ class Deobfuscator(
         register<RuntimeExceptionTransformer>()
         register<DeadCodeTransformer>()
         register<OpaquePredicateTransformer>()
-        register<DeadCodeTransformer>()
-        register<ControlFlowTransformer>()
+        register<UnusedArgumentTransformer>()
         register<RenameTransformer>()
+        register<ControlFlowTransformer>()
         register<FinalClassTransformer>()
         register<InvokeSpecialTransformer>()
 
@@ -129,5 +129,9 @@ class Deobfuscator(
     companion object {
         @JvmStatic
         fun main(args: Array<String>) = Command().main(args)
+
+        fun String.isDeobfuscatedName(): Boolean {
+            return listOf("class", "method", "field").any { this.startsWith(it) && this.endsWith(".class") }
+        }
     }
 }

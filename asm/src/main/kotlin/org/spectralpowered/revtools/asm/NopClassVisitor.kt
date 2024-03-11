@@ -19,6 +19,8 @@
 package org.spectralpowered.revtools.asm
 
 import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.ASM9
 
 object NopClassVisitor : ClassVisitor(ASM9)
+object NopMethodVisitor : MethodVisitor(ASM9)

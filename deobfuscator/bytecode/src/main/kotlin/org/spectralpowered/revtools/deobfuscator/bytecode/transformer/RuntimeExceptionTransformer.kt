@@ -18,9 +18,7 @@
 
 package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 
-import org.objectweb.asm.Opcodes.ATHROW
 import org.objectweb.asm.tree.MethodNode
-import org.spectralpowered.revtools.asm.node.nextReal
 import org.spectralpowered.revtools.deobfuscator.bytecode.Transformer
 import org.tinylog.kotlin.Logger
 

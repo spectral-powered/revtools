@@ -21,11 +21,8 @@ package org.spectralpowered.revtools.decompiler
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.file
-import com.github.ajalt.clikt.parameters.types.path
 import org.jetbrains.java.decompiler.main.Fernflower
 import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences
-import java.nio.file.Files
-import java.util.jar.JarFile
 
 class Decompiler : CliktCommand(
     name = "decompile",

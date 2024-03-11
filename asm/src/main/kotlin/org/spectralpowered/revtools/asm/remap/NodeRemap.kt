@@ -20,20 +20,7 @@ package org.spectralpowered.revtools.asm.remap
 
 import org.objectweb.asm.Type
 import org.objectweb.asm.commons.Remapper
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.FieldInsnNode
-import org.objectweb.asm.tree.FieldNode
-import org.objectweb.asm.tree.FrameNode
-import org.objectweb.asm.tree.InnerClassNode
-import org.objectweb.asm.tree.InvokeDynamicInsnNode
-import org.objectweb.asm.tree.LdcInsnNode
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.MultiANewArrayInsnNode
-import org.objectweb.asm.tree.ParameterNode
-import org.objectweb.asm.tree.TryCatchBlockNode
-import org.objectweb.asm.tree.TypeInsnNode
+import org.objectweb.asm.tree.*
 
 fun ClassNode.remap(remapper: AsmRemapper) {
     val originalName = name
@@ -61,6 +48,9 @@ fun ClassNode.remap(remapper: AsmRemapper) {
     for (method in methods) {
         method.remap(remapper, originalName)
     }
+
+    visibleAnnotations?.forEach { it.remap(remapper) }
+    invisibleAnnotations?.forEach { it.remap(remapper) }
 }
 
 fun InnerClassNode.remap(remapper: Remapper) {
@@ -74,6 +64,8 @@ fun FieldNode.remap(remapper: AsmRemapper, owner: String) {
     desc = remapper.mapDesc(desc)
     signature = remapper.mapSignature(signature, true)
     value = remapper.mapValue(value)
+    visibleAnnotations?.forEach { it.remap(remapper) }
+    invisibleAnnotations?.forEach { it.remap(remapper) }
 }
 
 fun MethodNode.remap(remapper: AsmRemapper, owner: String) {
@@ -97,6 +89,9 @@ fun MethodNode.remap(remapper: AsmRemapper, owner: String) {
     for (tryCatch in tryCatchBlocks) {
         tryCatch.remap(remapper)
     }
+
+    visibleAnnotations?.forEach { it.remap(remapper) }
+    invisibleAnnotations?.forEach { it.remap(remapper) }
 }
 
 fun ParameterNode.remap(
@@ -138,4 +133,8 @@ fun AbstractInsnNode.remap(remapper: AsmRemapper) {
         is LdcInsnNode -> cst = remapper.mapValue(cst)
         is MultiANewArrayInsnNode -> desc = remapper.mapType(desc)
     }
+}
+
+fun AnnotationNode.remap(remapper: AsmRemapper) {
+    desc = remapper.mapDesc(desc)
 }

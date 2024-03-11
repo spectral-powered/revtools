@@ -29,8 +29,7 @@ import org.spectralpowered.revtools.asm.util.ForestDisjointSet
 import org.spectralpowered.revtools.asm.util.toClassName
 import java.io.File
 import java.nio.file.Files
-import java.util.SortedMap
-import java.util.TreeMap
+import java.util.*
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
@@ -136,6 +135,9 @@ class ClassPool {
         val cls = block(name)?.also { addClass(it) }
         return cls
     }
+
+    fun getMethodMemberRef(memberRef: MemberRef) = findClass(memberRef.owner)?.getMethod(memberRef.name, memberRef.desc)
+    fun getFieldMemberRef(memberRef: MemberRef) = findClass(memberRef.owner)?.getField(memberRef.name, memberRef.desc)
 
     fun createInheritedMethodSets() = createInheritedMemberSets(
             ClassNode::memberMethods,

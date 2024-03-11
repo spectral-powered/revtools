@@ -19,9 +19,8 @@
 package org.spectralpowered.revtools.asm
 
 import org.objectweb.asm.ClassWriter
-import org.spectralpowered.revtools.asm.ClassPool
 
-class AsmClassWriter(private val pool: ClassPool) : ClassWriter(COMPUTE_FRAMES) {
+class AsmClassWriter(private val pool: ClassPool) : ClassWriter(COMPUTE_MAXS) {
     override fun getCommonSuperClass(cls1: String, cls2: String): String {
         try {
             return super.getCommonSuperClass(cls1, cls2)
