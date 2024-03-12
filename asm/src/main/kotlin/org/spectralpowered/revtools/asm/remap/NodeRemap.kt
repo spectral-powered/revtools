@@ -101,7 +101,7 @@ fun ParameterNode.remap(
     desc: String,
     index: Int
 ) {
-
+    name = remapper.mapArgumentName(owner, methodName, desc, index, name)
 }
 
 fun TryCatchBlockNode.remap(remapper: Remapper) {
@@ -122,7 +122,7 @@ fun AbstractInsnNode.remap(remapper: AsmRemapper) {
             val originalOwner = owner
             owner = remapper.mapMethodOwner(originalOwner, name, desc)
             name = remapper.mapMethodName(originalOwner, name, desc)
-            desc = remapper.mapMethodDesc(desc)
+            desc = remapper.mapDesc(desc)
         }
 
         is InvokeDynamicInsnNode -> {

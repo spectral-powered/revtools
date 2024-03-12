@@ -16,32 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.spectralpowered.revtools.asm.remap
+package org.spectralpowered.revtools.asm.node
 
-import org.objectweb.asm.commons.Remapper
 import org.objectweb.asm.tree.AbstractInsnNode
+import org.spectralpowered.revtools.asm.stackMetadata
 
-open class AsmRemapper : Remapper() {
+private val ANY_INSN = { _: AbstractInsnNode -> true }
 
-    open fun mapMethodOwner(owner: String, name: String, desc: String): String {
-        return mapType(owner)
-    }
+fun AbstractInsnNode.getExpression(
+    filter: (AbstractInsnNode) -> Boolean = ANY_INSN,
+    initialHeight: Int = 0
+): List<AbstractInsnNode>? {
+    val expr = mutableListOf<AbstractInsnNode>()
 
-    open fun mapFieldOwner(owner: String, name: String, desc: String): String {
-        return mapType(owner)
-    }
+    var height = initialHeight
+    var insn: AbstractInsnNode? = this
+    do {
+        val (pops, pushes) = insn!!.stackMetadata
+        expr.add(insn)
+        if(insn !== this || initialHeight != 0) {
+            height -= pushes
+        }
+        height += pops
 
-    open fun getFieldInitializer(owner: String, name: String, desc: String): List<AbstractInsnNode>? {
-        return null
-    }
+        if(height == 0) {
+            return expr.asReversed()
+        }
 
-    open fun mapArgumentName(
-        owner: String,
-        name: String,
-        desc: String,
-        index: Int,
-        argumentName: String?
-    ): String? {
-        return argumentName
-    }
+        insn = insn.previous
+    } while(insn != null && insn.isSequential && filter(insn))
+
+    return null
 }

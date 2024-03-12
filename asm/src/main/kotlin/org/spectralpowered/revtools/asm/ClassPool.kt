@@ -23,6 +23,7 @@ import org.objectweb.asm.Opcodes.ACC_STATIC
 import org.objectweb.asm.tree.ClassNode
 import org.spectralpowered.revtools.asm.node.*
 import org.spectralpowered.revtools.asm.remap.AsmRemapper
+import org.spectralpowered.revtools.asm.remap.ClassPoolMapper
 import org.spectralpowered.revtools.asm.remap.remap
 import org.spectralpowered.revtools.asm.util.DisjointSet
 import org.spectralpowered.revtools.asm.util.ForestDisjointSet
@@ -125,9 +126,7 @@ class ClassPool {
     }
 
     fun remap(remapper: AsmRemapper) {
-        for(cls in classes) {
-            cls.remap(remapper)
-        }
+        ClassPoolMapper(this, remapper).remap()
     }
 
     private inline fun computeIfAbsent(name: String, block: (String) -> ClassNode?): ClassNode? {
