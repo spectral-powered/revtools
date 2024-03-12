@@ -49,6 +49,7 @@ class Deobfuscator(
         register<ControlFlowTransformer>()
         register<FinalClassTransformer>()
         register<InvokeSpecialTransformer>()
+        register<CounterTransformer>()
 
         Logger.info("Registered ${transformers.size} bytecode transformers.")
     }

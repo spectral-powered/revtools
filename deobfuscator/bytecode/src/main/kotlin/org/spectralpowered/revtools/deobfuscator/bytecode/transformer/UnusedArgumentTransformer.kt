@@ -21,11 +21,9 @@ package org.spectralpowered.revtools.deobfuscator.bytecode.transformer
 import com.google.common.collect.MultimapBuilder
 import org.objectweb.asm.Type
 import org.objectweb.asm.Type.*
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.VarInsnNode
+import org.objectweb.asm.tree.*
 import org.spectralpowered.revtools.asm.MemberRef
+import org.spectralpowered.revtools.asm.analysis.DataFlowAnalyzer
 import org.spectralpowered.revtools.asm.node.*
 import org.spectralpowered.revtools.deobfuscator.bytecode.Deobfuscator.Companion.isDeobfuscatedName
 import org.spectralpowered.revtools.deobfuscator.bytecode.Transformer

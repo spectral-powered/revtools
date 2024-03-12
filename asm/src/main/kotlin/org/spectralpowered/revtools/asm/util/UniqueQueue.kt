@@ -18,11 +18,43 @@
 
 package org.spectralpowered.revtools.asm.util
 
-fun String.toClassName() = replace("/", ".")
-fun String.toAsmName() = replace(".", "/")
+class UniqueQueue<T> {
+    private val queue = ArrayDeque<T>()
+    private val set = mutableSetOf<T>()
 
-fun String.isObfuscatedName(): Boolean {
-    return (this.length <= 2) ||
-            ((this.length == 3 && listOf("add", "get", "set", "put", "run").none { this.startsWith(it) })
-            && listOf("class", "method", "field").none { this.startsWith(it) })
+    fun add(value: T): Boolean {
+        if(set.add(value)) {
+            queue.addLast(value)
+            return true
+        }
+        return false
+    }
+
+    fun addAll(values: Iterable<T>) {
+        for(value in values) {
+            add(value)
+        }
+    }
+
+    operator fun plusAssign(value: T) {
+        add(value)
+    }
+
+    operator fun plusAssign(values: Iterable<T>) {
+        addAll(values)
+    }
+
+    fun removeFirstOrNull(): T? {
+        val value = queue.removeFirstOrNull()
+        if(value != null) {
+            set.remove(value)
+            return value
+        }
+        return null
+    }
+
+    fun clear() {
+        queue.clear()
+        set.clear()
+    }
 }

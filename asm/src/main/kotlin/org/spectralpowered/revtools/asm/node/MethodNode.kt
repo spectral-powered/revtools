@@ -40,6 +40,9 @@ fun MethodNode.isStatic() = (access and ACC_STATIC) != 0
 fun MethodNode.isAbstract() = (access and ACC_ABSTRACT) != 0
 fun MethodNode.isInterface() = (access and ACC_INTERFACE) != 0
 
+fun MethodNode.isConstructor() = name == "<init>"
+fun MethodNode.isInitializer() = name == "<clinit>"
+
 fun MethodNode.removeArg(argIndex: Int) {
     val type = Type.getType(desc)
     val argType = type.argumentTypes[argIndex]

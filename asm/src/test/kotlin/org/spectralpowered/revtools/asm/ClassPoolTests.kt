@@ -19,8 +19,8 @@
 package org.spectralpowered.revtools.asm
 
 import io.kotest.core.spec.style.FunSpec
+import org.spectralpowered.revtools.asm.analysis.execution.Execution
 import org.spectralpowered.revtools.asm.node.getMethod
-import org.spectralpowered.revtools.asm.node.memberRef
 import java.io.File
 
 class ClassPoolTests : FunSpec({
@@ -30,7 +30,7 @@ class ClassPoolTests : FunSpec({
         pool.loadJar(File("../build/revtools/gamepack.jar"))
         pool.build()
 
-        pool.writeJar(File("../build/revtools/gamepack.out.jar"))
+        //pool.writeJar(File("../build/revtools/gamepack.out.jar"))
 
         println()
     }
@@ -43,9 +43,9 @@ class ClassPoolTests : FunSpec({
         val cls = pool.findClass("client")!!
         val method = cls.getMethod("init", "()V")!!
 
-        val inheritedMethods = pool.createInheritedMethodSets()
-        val inheritedMethod = inheritedMethods[method.memberRef]!!
+        val execution = Execution(pool)
+        execution.populateEntryPoints()
 
-        println(inheritedMethod)
+        println()
     }
 })

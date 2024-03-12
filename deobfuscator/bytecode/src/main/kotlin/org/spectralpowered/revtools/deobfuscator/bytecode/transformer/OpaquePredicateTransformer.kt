@@ -34,11 +34,11 @@ class OpaquePredicateTransformer : Transformer() {
     override fun transformMethod(method: MethodNode): Boolean {
         for(insns in EXCEPTION_PATTERN.match(method).filter { checkExceptionPattern(method, it) }) {
             method.removeMatchedInsns(insns)
-            break
+            continue
         }
         for(insns in RETURN_PATTERN.match(method).filter { checkReturnPattern(method, it) }) {
             method.removeMatchedInsns(insns)
-            break
+            continue
         }
         return false
     }
